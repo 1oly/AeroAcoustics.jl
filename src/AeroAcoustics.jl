@@ -1,5 +1,20 @@
+__precompile__()
 module AeroAcoustics
+using ImageFiltering
 
-# package code goes here
+import Base.length,
+       Base.push!,
+       Base.Threads
+       ImageFiltering.imfilter
 
-end # module
+export cmf,
+       #cmf2,
+       beamformer,
+       fista
+
+include("beamformer.jl")
+include("cmf.jl")
+#include("cmf2.jl")
+include("fista.jl")
+
+end
