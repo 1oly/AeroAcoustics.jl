@@ -1,4 +1,4 @@
-function cmf{T,R}(GhG::T,X::R,GhPG::T,t::Float64,lambda::Float64,kmax::Int64)
+function cmf{T,C}(GhG::Array{C,2},X::Array{T,2},GhPG::Array{C,2},t::T,lambda::T,kmax::Int64)
     Xprev = copy(X)
     Y = similar(X)
     k = 1
@@ -15,8 +15,19 @@ function cmf{T,R}(GhG::T,X::R,GhPG::T,t::Float64,lambda::Float64,kmax::Int64)
     return X
 end
 
-#function grad(GhG,X,GhPG,lambda)
-function grad{T,R}(GhG::T,X::R,GhPG::T,lambda::Float64)
+function cmf{T,C}(GhG::Array{C,3},X::Array{T,2},GhPG::Array{C,3},t::T,lambda::T,kmax::Int64)
+    Y = Similar(GhG)
+    Nx,Ny,Nf = size(GhG)
+    Xprev = copy(X)
+    Threads.@threads for i in Nf:-1:1
+        Y[:,:,i] = cmf(GhG[:,:,i],Xprev,GhPG[:,:,i],t,lambda,kmax)
+        Xprev = reshape(Y[:,:,i],Nx,Ny)
+    end
+    return Y
+end
+
+
+function grad{T,C}(GhG::Array{C,2},X::Array{T,2},GhPG::Array{C,2},lambda::T)
     if isdiag(X)
         Y = similar(GhG)
         return Y .= diagm(-diag(GhPG-GhG*X*GhG))+lambda*eye(size(X,1))
@@ -26,7 +37,7 @@ function grad{T,R}(GhG::T,X::R,GhPG::T,lambda::Float64)
     end
 end
 
-function prox(X)
+function prox{T}(X::Array{T,2})
     if isdiag(X)
         Y = similar(X)
         return Y = diagm(max.(diag(real(X)),0.0))
