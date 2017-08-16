@@ -1,5 +1,4 @@
 *.exe
-*.pdf
 *.dll
 *.dwo
 *.do
@@ -12,5 +11,8 @@
 *.jl.*.cov
 *.jl.mem
 *.ji
+
+*.svg
+*.tmp
 
 .DS_Store
