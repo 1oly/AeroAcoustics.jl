@@ -1,3 +1,16 @@
+*.exe
+*.pdf
+*.dll
+*.dwo
+*.do
+*.o
+*.obj
+*.so
+*.dylib
+*.dSYM
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
+*.ji
+
+.DS_Store
