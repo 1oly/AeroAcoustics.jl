@@ -12,6 +12,7 @@
 *.jl.mem
 *.ji
 
+*.pdf
 *.svg
 *.tmp
 
