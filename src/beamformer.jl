@@ -1,21 +1,21 @@
-function beamformer{T,C}(Nx::Int64,Ny::Int64,X,Y,z0,f::T,rn,CSM::Array{C,2};psf::Bool=false)
-    const M = size(rn,1)    # Number of microphones
-    const omega = 2pi*f     # Angular frequency
-    const c = 343           # Speed of sound
-    # CSM[eye(Bool,M)] = 0;    # Naive diagonal removal
+function beamformer{T,C}(Nx::Int64,Ny::Int64,X::Array{T,2},Y::Array{T,2},z0::T,f::T,rn::Array{T,2},CSM::Array{C,2};psf::Bool=false)
+    const M::Int64 = size(rn,1)    # Number of microphones
+    const omega::T = 2pi*f         # Angular frequency
+    const c::Float64 = 343.0       # Speed of sound
+    # CSM[eye(Bool,M)] = 0;        # Naive diagonal removal
 
     # Allocation of arrays
     gj = Array{C}(M)
     gjs = Array{C}(Nx,Ny,M)
     b = Array{T}(Nx,Ny)
+
     # Compute transfer functions
-    for i in 1:Nx
+    Threads.@threads for i in 1:Nx
         for j in 1:Ny
-            r0 = sqrt(X[i,j]^2 + Y[i,j]^2 + z0^2)
-            Threads.@threads for m in 1:M
-                rm = sqrt((X[i,j]-rn[m,1])^2+(Y[i,j]-rn[m,2])^2 + z0^2)
-                # TYPE II? Steering vector:
-                gj[m] = (1/M)*(rm/r0)*exp(-im*omega*(rm-r0)/c)
+            r0::Float64 = sqrt(X[i,j]^2 + Y[i,j]^2 + z0^2)
+            for m in 1:M
+                rm::Float64 = sqrt((X[i,j]-rn[m,1])^2+(Y[i,j]-rn[m,2])^2 + z0^2)
+                gj[m] = (1/M)*(rm/r0)*exp(-im*omega*(rm-r0)/c) # TYPE II? Steering vector:
             end
             gjs[i,j,:] = gj
             b[i,j] = real(gj'*CSM*gj)
@@ -25,6 +25,9 @@ function beamformer{T,C}(Nx::Int64,Ny::Int64,X,Y,z0,f::T,rn,CSM::Array{C,2};psf:
 
     if psf
         PSF = Array{T}(Nx,Ny)
+        g1 = Array{C}(M)
+        midx::Int64 = 0
+        midy::Int64 = 0
         if iseven(Nx)
             midx = Nx/2
         elseif isodd(Nx)
