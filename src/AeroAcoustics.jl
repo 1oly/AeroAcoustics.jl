@@ -1,6 +1,6 @@
 #__precompile__()
 module AeroAcoustics
-using ImageFiltering
+using ImageFiltering, NLsolve
 
 import Base.length,
        Base.push!,
@@ -10,9 +10,12 @@ import Base.length,
 export cmf,
        SPL,
        beamformer,
-       fista
+       beamformer_corr,
+       fista,
+       shear
 
 include("beamformer.jl")
+include("beamformer_corr.jl")
 include("cmf.jl")
 include("utils.jl")
 include("fista.jl")
