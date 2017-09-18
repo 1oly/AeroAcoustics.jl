@@ -1,4 +1,14 @@
-function beamformer{T,C}(Nx::Int64,Ny::Int64,X::Array{T,2},Y::Array{T,2},z0::T,f::T,rn::Array{T,2},CSM::Array{C,2};psf::Bool=false)
+function beamformer{T,C}(
+    Nx::Int64,
+    Ny::Int64,
+    X::Array{T,2},
+    Y::Array{T,2},
+    z0::T,
+    f::T,
+    rn::Array{T,2},
+    CSM::Array{C,2};
+    psf::Bool=false)
+
     const M::Int64 = size(rn,1)    # Number of microphones
     const omega::T = 2pi*f         # Angular frequency
     const c::Float64 = 343.0       # Speed of sound
@@ -50,7 +60,17 @@ function beamformer{T,C}(Nx::Int64,Ny::Int64,X::Array{T,2},Y::Array{T,2},z0::T,f
     end
 end
 
-function beamformer{T,C}(Nx::Int64,Ny::Int64,X,Y,z0,f::Array{T,1},rn,CSM::Array{C,3};psf::Bool=false)
+function beamformer{T,C}(
+    Nx::Int64,
+    Ny::Int64,
+    X::Array{T,2},
+    Y::Array{T,2},
+    z0::T,
+    f::Array{T,1},
+    rn::Array{T,2},
+    CSM::Array{C,3};
+    psf::Bool=false)
+
     const M = size(rn,1)    # Number of microphones
     Nf = length(f)
     b = Array{T}(Nx,Ny,Nf)
