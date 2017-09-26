@@ -9,6 +9,7 @@ import Base.length,
 
 export cmf,
        SPL,
+       octavebandlimits,
        beamformer,
        beamformer_corr,
        fista,
