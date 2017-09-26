@@ -4,8 +4,9 @@ using ImageFiltering, NLsolve
 
 import Base.length,
        Base.push!,
-       Base.Threads
-       ImageFiltering.imfilter
+       Base.Threads,
+       ImageFiltering.imfilter,
+       ImageFiltering.Fill
 
 export cmf,
        SPL,

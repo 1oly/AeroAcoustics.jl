@@ -10,11 +10,11 @@ function fista{T}(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64)
 
     s = rand(size(psf))
     for k = 1:10
-        s = imfilter(s,centered(psf))/vecnorm(s,2)
+        s = imfilter(s,centered(psf),Fill(zero(eltype(s))),Algorithm.FFT())/vecnorm(s,2)
     end
     L = vecnorm(s,2)^2
-    r = imfilter(Y,centered(psf),Algorithm.FFT())-b
-    gradY = imfilter(r,centered(psft),Algorithm.FFT())
+    r = imfilter(Y,centered(psf),Fill(zero(eltype(Y))),Algorithm.FFT())-b
+    gradY = imfilter(r,centered(psft),Fill(zero(eltype(r))),Algorithm.FFT())
     k = 0
     while k < maxit
         k += 1
@@ -22,8 +22,8 @@ function fista{T}(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64)
         X = max.(0.0,real(Y-(1/L)*gradY))
         tnew = (1+sqrt.(1+4*t^2))/2
         Y = X + ((t-1)/tnew)*(X-Xprev)
-        r = imfilter(Y,centered(psf),Algorithm.FFT())-b
-        gradY = imfilter(r,centered(psft),Algorithm.FFT())
+        r = imfilter(Y,centered(psf),Fill(zero(eltype(Y))),Algorithm.FFT())-b
+        gradY = imfilter(r,centered(psft),Fill(zero(eltype(r))),Algorithm.FFT())
         Xprev = X
         t = tnew
     end
