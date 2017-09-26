@@ -9,7 +9,7 @@ function beamformer{T,C}(
     CSM::Array{C,2};
     psf::Bool=false)
 
-    const M::Int64 = size(rn,1)    # Number of microphones
+    const M = size(rn,1)    # Number of microphones
     const omega::T = 2pi*f         # Angular frequency
     const c::Float64 = 343.0       # Speed of sound
     # CSM[eye(Bool,M)] = 0;        # Naive diagonal removal
@@ -25,7 +25,8 @@ function beamformer{T,C}(
             r0::Float64 = sqrt(X[i,j]^2 + Y[i,j]^2 + z0^2)
             for m in 1:M
                 rm::Float64 = sqrt((X[i,j]-rn[m,1])^2+(Y[i,j]-rn[m,2])^2 + z0^2)
-                gj[m] = (1/M)*(rm/r0)*exp(-im*omega*(rm-r0)/c) # TYPE II? Steering vector:
+                gj[m] = (1/M)*exp(-im*omega*(rm-r0)/c) # TYPE I Steering vector
+                #gj[m] = (1/M)*(rm/r0)*exp(-im*omega*(rm-r0)/c) # TYPE II Steering vector
             end
             gjs[i,j,:] = gj
             b[i,j] = real(gj'*CSM*gj)
