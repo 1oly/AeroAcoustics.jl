@@ -35,9 +35,14 @@ function fista{T}(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64)
     Nx,Ny,Nf = size(b)
     Xprev = copy(X0)
     obj = zeros(maxit,Nf)
-    Threads.@threads for i in Nf:-1:1
-        Y[:,:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit::Int64)
-        Xprev = reshape(Y[:,:,i],Nx,Ny)
+    for i in 1:Nf
+        Y[:,:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit)
     end
+
+    # Warm-start:
+    #Threads.@threads for i in Nf:-1:1
+    #    Y[:,:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit)
+    #    Xprev = reshape(Y[:,:,i],Nx,Ny)
+    #end
     return Y
 end
