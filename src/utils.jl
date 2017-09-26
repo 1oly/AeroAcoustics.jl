@@ -1,7 +1,7 @@
 function SPL{T}(p::Array{T})
     s = similar(p)
     s[p.>0] = 10*log10.(p[p.>0]/4e-10)
-    s[p.<0] = -350
+    s[p.<=0] = -350
     return s
 end
 SPL(p::Number) = 10*log10(p/4e-10)
@@ -12,4 +12,12 @@ function shear(xi,fvec,xm,M,h)
     fvec[1] = (1/a)*xi[1]-(1/b)*(1-M^2)*(xm[1]-xi[1]) - M
     fvec[2] = (1/a)*xi[2]-(1/b)*(xm[2]-xi[2])
     fvec[3] = xi[3] - h
+end
+
+function octavebandlimits(fc,kind)
+    fl,fu = similar(fc)
+    const C = 10^(3./10.)
+    fl = fc*C^(-1/(2*kind))
+    fu = fc*C^(1/(2*kind))
+    return fl, fu
 end
