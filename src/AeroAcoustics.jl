@@ -14,7 +14,8 @@ export cmf,
        beamformer,
        beamformer_corr,
        fista,
-       shear
+       shear,
+       fistalasso
 
 include("beamformer.jl")
 include("beamformer_corr.jl")
