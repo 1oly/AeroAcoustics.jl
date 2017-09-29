@@ -25,8 +25,8 @@ function beamformer{T,C}(
             r0::Float64 = sqrt(X[i,j]^2 + Y[i,j]^2 + z0^2)
             for m in 1:M
                 rm::Float64 = sqrt((X[i,j]-rn[m,1])^2+(Y[i,j]-rn[m,2])^2 + z0^2)
-                gj[m] = (1/M)*exp(-im*omega*(rm-r0)/c) # TYPE I Steering vector
-                #gj[m] = (1/M)*(rm/r0)*exp(-im*omega*(rm-r0)/c) # TYPE II Steering vector
+                #gj[m] = (1/M)*exp(-im*omega*(rm-r0)/c) # TYPE I Steering vector
+                gj[m] = (1/M)*(rm/r0)*exp(-im*omega*(rm-r0)/c) # TYPE II Steering vector
             end
             gjs[i,j,:] = gj
             b[i,j] = real(gj'*CSM*gj)
