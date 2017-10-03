@@ -3,21 +3,22 @@ function fista{T}(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64)
     Xprev = X
     Y = X
     t = 1.
-    N = size(X,1)
+    Nx,Ny = size(X)
     obj = zeros(maxit)
     psft = transpose(psf)
-    Fps = fft(fftshift(psf))
-    FpsT = fft(fftshift(psf'))
+    center = round(Int64,Nx/2)+1,round(Int64,Ny/2)+1
+    Fps = fft(circshift(psf,center))
+    FpsT = fft(circshift(psf',center))
     s = rand(size(psf))
     for k = 1:10
         s = ifft(fft(s).*Fps)/vecnorm(s)
-        #s = imfilter(s,centered(psf))/vecnorm(s,2)
+        #s = imfilter(s,centered(psf))/vecnorm(s)
     end
     L = vecnorm(s)^2
-    r = real(ifft(fft(Y).*Fps))-b
+    r = real(ifft(Fps.*fft(Y)))-b
     #r = imfilter(Y,centered(psf),Fill(zero(eltype(Y))),Algorithm.FFT())-b
-    gradY = real(ifft(FpsT.*fft(r)))
-    #gradY = imfilter(centered(psft),r,Fill(zero(eltype(r))),Algorithm.FFT())
+    gradY = real(ifft(conj(Fps).*fft(r)))
+    #gradY = imfilter(r,centered(psft),Fill(zero(eltype(r))),Algorithm.FFT())
     k = 0
     while k < maxit
         k += 1
@@ -25,10 +26,10 @@ function fista{T}(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64)
         X = max.(0.0,real(Y-(1./L)*gradY))
         tnew = 0.5*(1.+sqrt.(1.+4.*t^2))
         Y = X + ((t-1.)/tnew)*(X-Xprev)
-        r = real(ifft(fft(Y).*Fps))-b
+        r = real(ifft(Fps.*fft(Y)))-b
         #r = imfilter(Y,centered(psf),Fill(zero(eltype(Y))),Algorithm.FFT())-b
-        gradY = real(ifft(FpsT.*fft(r)))
-        #gradY = imfilter(centered(psft),r,Fill(zero(eltype(r))),Algorithm.FFT())
+        gradY = real(ifft(conj(Fps).*fft(r)))
+        #gradY = imfilter(r,centered(psft),Fill(zero(eltype(r))),Algorithm.FFT())
         Xprev = X
         t = tnew
     end
@@ -52,12 +53,11 @@ function fista{T}(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64)
     return Y,obj
 end
 
-function fistalasso{T}(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64)
+function fistalasso{T}(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,lambda::T)
     obj = zeros(maxit)
     beta = maximum(abs.(fft(psf)))^2
     fpsf = fft(fftshift(psf))
     gamma = 1/beta
-    lambda = 1e-7
     prox(x,gamma,lambda) = x - x./max.(abs.(x)./(lambda.*gamma), 1)
     a = 10
     X = b
@@ -74,13 +74,13 @@ function fistalasso{T}(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64
     return X,obj
 end
 
-function fistalasso{T}(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64)
+function fistalasso{T}(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,lambda::T)
     Y = similar(b)
     Nx,Ny,Nf = size(b)
     Xprev = copy(X0)
     obj = zeros(maxit,Nf)
     for i in 1:Nf
-        Y[:,:,i],obj[:,i] = fistalasso(psf[:,:,i],b[:,:,i],Xprev,maxit)
+        Y[:,:,i],obj[:,i] = fistalasso(psf[:,:,i],b[:,:,i],Xprev,maxit,lambda)
     end
 
     # Warm-start:

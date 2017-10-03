@@ -9,9 +9,9 @@ function beamformer{T,C}(
     CSM::Array{C,2};
     psf::Bool=false)
 
-    const M = size(rn,1)    # Number of microphones
-    const omega::T = 2pi*f         # Angular frequency
+    const M = size(rn,1)           # Number of microphones
     const c::Float64 = 343.0       # Speed of sound
+    const kw::T = 2pi*f/c          # wavenumber
     # CSM[eye(Bool,M)] = 0;        # Naive diagonal removal
 
     # Allocation of arrays
@@ -25,18 +25,18 @@ function beamformer{T,C}(
             r0::Float64 = sqrt(X[i,j]^2 + Y[i,j]^2 + z0^2)
             for m in 1:M
                 rm::Float64 = sqrt((X[i,j]-rn[m,1])^2+(Y[i,j]-rn[m,2])^2 + z0^2)
-                #gj[m] = (1/M)*exp(-im*omega*(rm-r0)/c) # TYPE I Steering vector
-                gj[m] = (1/M)*(rm/r0)*exp(-im*omega*(rm-r0)/c) # TYPE II Steering vector
+                #gj[m] = exp(-im*kw*(rm-r0)) # TYPE I Steering vector
+                gj[m] = (rm/r0)*exp(-im*kw*(rm-r0)) # TYPE II Steering vector
             end
             gjs[i,j,:] = gj
-            b[i,j] = real(gj'*CSM*gj)
+            b[i,j] = real(gj'*CSM*gj)/M^2
         end
     end
 
 
     if psf
         PSF = Array{T}(Nx,Ny)
-        g1 = Array{C}(M)
+        grs = Array{C}(M)
         midx::Int64 = 0
         midy::Int64 = 0
         if iseven(Nx)
@@ -49,10 +49,11 @@ function beamformer{T,C}(
         elseif isodd(Ny)
             midy = round(Int64,Ny/2)+1
         end
-        g1 = vec(gjs[midx,midy,:])
+        grs = vec(gjs[midx,midy,:])
         Threads.@threads for i in 1:Nx
             for j in 1:Ny
-                PSF[i,j] = real(vec(gjs[i,j,:])'*g1)
+                PSF[i,j] = abs(vec(gjs[i,j,:])'*grs*grs'*vec(gjs[i,j,:]))/M^2
+                #PSF[i,j] = vec(gjs[i,j,:])'*grs
             end
         end
         return b,gjs,PSF
