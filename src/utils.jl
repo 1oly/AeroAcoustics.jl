@@ -58,7 +58,7 @@ function steeringvectors(E::Environment,C::Constants,kind::String="II")
         for j in 1:length(E.f)
             for i in eachindex(E.D0)
                 for m in 1:E.M
-                    vi[m,i,j] = (1/E.M)*(E.D[i,m]/E.D0[i])*exp(im*kw[j]*(E.D0[i]-E.D[i,m]))
+                    vi[m,i,j] = (1/E.M)*(E.D[i,m]/E.D0[i])*exp(-im*kw[j]*(E.D[i,m]-E.D0[i]))
                 end
             end
         end
