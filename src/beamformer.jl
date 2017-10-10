@@ -23,13 +23,17 @@ function beamformer{T,C}(
     Threads.@threads for i in 1:Nx
         for j in 1:Ny
             r0::Float64 = sqrt(X[i,j]^2 + Y[i,j]^2 + z0^2)
+            #rsum = 0.0 # Type III Steering vector
             for m in 1:M
                 rm::Float64 = sqrt((X[i,j]-rn[m,1])^2+(Y[i,j]-rn[m,2])^2 + z0^2)
                 #gj[m] = exp(-im*kw*(rm-r0)) # TYPE I Steering vector
-                gj[m] = (rm/r0)*exp(-im*kw*(rm-r0)) # TYPE II Steering vector
+                gj[m] = (1/M)*(rm/r0)*exp(-im*kw*(rm-r0)) # TYPE II Steering vector
+                #gj[m] = (1/(r0*rm))*exp(-im*kw*(rm-r0)) # TYPE III Steering vector
+                #rsum += 1/rm^2
             end
+            #gj *= 1/rsum # Type III Steering vector
             gjs[i,j,:] = gj
-            b[i,j] = real(gj'*CSM*gj)/M^2
+            b[i,j] = real(gj'*CSM*gj)
         end
     end
 
@@ -52,8 +56,8 @@ function beamformer{T,C}(
         grs = vec(gjs[midx,midy,:])
         Threads.@threads for i in 1:Nx
             for j in 1:Ny
-                PSF[i,j] = abs(vec(gjs[i,j,:])'*grs*grs'*vec(gjs[i,j,:]))/M^2
-                #PSF[i,j] = vec(gjs[i,j,:])'*grs
+                #PSF[i,j] = abs(vec(gjs[i,j,:])'*grs*grs'*vec(gjs[i,j,:]))/M^2
+                PSF[i,j] = M^2*abs(vec(gjs[i,j,:])'*grs)^2 # Needs to multiply with (r0/rm)^2 to correct level
             end
         end
         return b,gjs,PSF
