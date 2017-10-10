@@ -19,6 +19,7 @@ export Constants,
        beamformersetup,
        steeringvectors,
        fista,
+       fftnnls,
        shear,
        fistalasso
 
@@ -29,5 +30,6 @@ include("beamformer2.jl")
 include("beamformer_corr.jl")
 include("cmf.jl")
 include("fista.jl")
+include("fftnnls.jl")
 
 end
