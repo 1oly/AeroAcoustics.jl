@@ -1,4 +1,4 @@
-#__precompile__()
+__precompile__()
 module AeroAcoustics
 using NLsolve, Distances
 
@@ -18,6 +18,7 @@ export Constants,
        beamformer2,
        beamformersetup,
        steeringvectors,
+       pointspreadfunction,
        fista,
        fftnnls,
        shear,
