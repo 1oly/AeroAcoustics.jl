@@ -1,4 +1,4 @@
-function fftnnls{T}(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64)
+function fftnnls(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64) where T
     X = copy(X0)
     Nx,Ny = size(X)
     obj = zeros(maxit)
@@ -21,7 +21,7 @@ function fftnnls{T}(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64)
     return X,obj
 end
 
-function fftnnls{T}(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64)
+function fftnnls(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64) where T
     X = similar(b)
     Nx,Ny,Nf = size(b)
     obj = zeros(maxit,Nf)
