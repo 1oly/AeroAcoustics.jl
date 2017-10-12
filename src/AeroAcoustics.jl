@@ -10,6 +10,7 @@ import Base.length,
 
 export Constants,
        Environment,
+       SteeringMatrix,
        cmf,
        SPL,
        octavebandlimits,
@@ -33,4 +34,6 @@ include("cmf.jl")
 include("fista.jl")
 include("fftnnls.jl")
 
+# precompile beamformer
+#precompile(beamformer2, (Environment{Float64},Constants{Float64},SteeringMatrix{Float64}));
 end
