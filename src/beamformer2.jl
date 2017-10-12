@@ -1,11 +1,13 @@
 function beamformer2(E::Environment{T},C::Constants,V::SteeringMatrix{T}) where T <: AbstractFloat
     b = Array{T}(E.N,E.Nf)
-
+    vd = Array{Complex{T}}(E.M)
+    CSM = Array{Complex{T}}(E.M,E.M)
     # Compute beamforming
     for j in 1:length(E.f)
+        CSM .= E.CSM[j,:,:]
         for i in eachindex(E.D0)
-            vd = @view V.v[:,i,j]
-            b[i,j] = real(vd'*E.CSM[j,:,:]*vd)
+            vd .= V.v[:,i,j]
+            b[i,j] = real(vd'*CSM*vd)
         end
     end
     return reshape(b,E.Nx,E.Ny,E.Nf)
@@ -14,7 +16,7 @@ end
 function pointspreadfunction(E::Environment{T},C::Constants,V::SteeringMatrix{T}) where T <: AbstractFloat
     PSF = Array{T}(E.N,E.Nf)
     gm = Array{Complex{T}}(E.M)
-    cent = round(Int64,E.N/2)+1
+    cent::Int64 = round(Int64,E.N/2)+1
 
     # Compute PSF
     for j in 1:length(E.f)
