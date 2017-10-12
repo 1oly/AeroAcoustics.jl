@@ -51,15 +51,13 @@ function beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata)
     return Environment(N,M,Nx,Ny,Nz,Nf,fn,micgeom,rx,ry,rz,Rxy,D0,D,csm)
 end
 
-function steeringvectors(E::Environment,C::Constants,kind::String="II")
+function steeringvectors(E::Environment{T},C::Constants{T},kind::String="II") where T <: AbstractFloat
     kw = 2pi*E.f/C.c
-    if kind == "II"
-        vi = Array{Complex{Float64}}(E.M,E.N,length(E.f))
-        for j in 1:length(E.f)
-            for i in eachindex(E.D0)
-                for m in 1:E.M
-                    vi[m,i,j] = (1/E.M)*(E.D[i,m]/E.D0[i])*exp(-im*kw[j]*(E.D[i,m]-E.D0[i]))
-                end
+    vi = Array{Complex{Float64}}(E.M,E.N,length(E.f))
+    for j in 1:length(E.f)
+        for i in eachindex(E.D0)
+            for m in 1:E.M
+                vi[m,i,j] = (1/E.M)*(E.D[i,m]/E.D0[i])*exp(-im*kw[j]*(E.D[i,m]-E.D0[i]))
             end
         end
     end
