@@ -47,6 +47,7 @@ function beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata)
     fn = fc[(fc.>=fl) .& (fc.<=fu)]
     ind = findin(fc,fn)
     csm = convert(Array{Complex{Float64},3},csmdata["csmReal"][ind,:,:]+im*csmdata["csmImaginary"][ind,:,:])
+    csm .*= 2   # To attain correct level. TODO!
     Nf = length(ind)
     return Environment(N,M,Nx,Ny,Nz,Nf,fn,micgeom,rx,ry,rz,Rxy,D0,D,csm)
 end
@@ -61,5 +62,19 @@ function steeringvectors(E::Environment{T},C::Constants{T},kind::String="II") wh
             end
         end
     end
-    return SteeringMatrix(vi) # [mics,gridpoints,freqs]
+    return SteeringMatrix(vi,kind) # [mics,gridpoints,freqs]
+end
+
+function steeringvectors(E::Environment{T},C::Constants{T},kind::String="III") where T <: AbstractFloat
+    kw = 2pi*E.f/C.c
+    vi = Array{Complex{Float64}}(E.M,E.N,length(E.f))
+    Dsum = sum(1./E.D.^2,2)
+    for j in 1:length(E.f)
+        for i in eachindex(E.D0)
+            for m in 1:E.M
+                vi[m,i,j] = 1/(E.D[i,m]*E.D0[i]*Dsum[i])*exp(-im*kw[j]*(E.D[i,m]-E.D0[i]))
+            end
+        end
+    end
+    return SteeringMatrix(vi,kind) # [mics,gridpoints,freqs]
 end

@@ -10,7 +10,7 @@ function fftnnls(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64) wher
     while k < maxit
         k += 1
 		r = real(ifft(Fps.*fft(X)))-b
-		obj[k] = 0.5*vecnorm(r)^2
+		obj[k] = 0.5*sum(abs2,r) #0.5*vecnorm(r)^2
 	    g = real(ifft(FpsT.*fft(r)))
 		w = g
 		w[(X .== 0.0) .& (w .> 0.0)] = 0.0

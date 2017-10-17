@@ -1,4 +1,4 @@
-function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64) where T <: AbstractFloat
+function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,tol::T=1e-8) where T <: AbstractFloat
     X = copy(X0)
     Xprev = X
     Y = X
@@ -10,11 +10,12 @@ function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64) where 
     Fps = fft(circshift(psf,center))
     FpsT = fft(circshift(psf',center))
     s = rand(size(psf))
-    for k = 1:10
+    for k = 1:10        # TODO: Try powm from IterativeSolvers.jl
         s = ifft(fft(s).*Fps)/vecnorm(s)
         #s = imfilter(s,centered(psf))/vecnorm(s)
     end
     L = vecnorm(s)^2
+    beta = 1./L
     r = real(ifft(Fps.*fft(Y)))-b
     #r = imfilter(Y,centered(psf),Fill(zero(eltype(Y))),Algorithm.FFT())-b
     gradY = real(ifft(FpsT.*fft(r)))
@@ -22,34 +23,41 @@ function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64) where 
     k = 0
     while k < maxit
         k += 1
-        obj[k] = 0.5*vecnorm(r)^2
-        X = max.(0.0,real(Y-(1./L)*gradY))
+        obj[k] = 0.5*sum(abs2,r)    #0.5vecnorm(r)^2
+        X = max.(0.0,real(Y-beta*gradY))
         tnew = 0.5*(1.+sqrt.(1.+4.*t^2))
         Y = X + ((t-1.)/tnew)*(X-Xprev)
         r = real(ifft(Fps.*fft(Y)))-b
         #r = imfilter(Y,centered(psf),Fill(zero(eltype(Y))),Algorithm.FFT())-b
         gradY = real(ifft(FpsT.*fft(r)))
         #gradY = imfilter(r,centered(psft),Fill(zero(eltype(r))),Algorithm.FFT())
+        if norm(X - Xprev,1)/length(X[:]) <= tol
+            break
+        end
         Xprev = X
         t = tnew
+        #if norm(Y-X, Inf)/beta <= tol*(1+norm(X, Inf))
+        #    println("Tolerance met at iteration $k ")
+        #    break
+        #end
     end
     return X,obj
 end
 
-function fista(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64) where T <: AbstractFloat
+function fista(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,tol::T=1e-8) where T <: AbstractFloat
     Y = similar(b)
     Nx,Ny,Nf = size(b)
     Xprev = copy(X0)
     obj = zeros(maxit,Nf)
-    for i in 1:Nf
-        Y[:,:,i],obj[:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit)
-    end
+    #for i in 1:Nf
+    #    Y[:,:,i],obj[:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit,tol)
+    #end
 
     # Warm-start:
-    #Threads.@threads for i in Nf:-1:1
-    #    Y[:,:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit)
-    #    Xprev = reshape(Y[:,:,i],Nx,Ny)
-    #end
+    for i in Nf:-1:1
+        Y[:,:,i],obj[:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit,tol)
+        Xprev = reshape(Y[:,:,i],Nx,Ny)
+    end
     return Y,obj
 end
 
@@ -61,7 +69,8 @@ function fistalasso(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,la
     fpsf = fft(circshift(psf,center))
     #fpsf = fft(fftshift(psf))
     gamma = 1/beta
-    prox(x,gamma,lambda) = x - x./max.(abs.(x)./(lambda.*gamma), 1)
+    prox(x,gamma,lambda) = max.(0,x-lambda*gamma) # This is L1_pos
+    #prox(x,gamma,lambda) = x - x./max.(abs.(x)./(lambda.*gamma), 1) # This is only L1-norm
     a = 10
     X = b
     Z = X

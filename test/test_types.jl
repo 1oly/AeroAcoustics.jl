@@ -17,13 +17,10 @@ Env = beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata)
 Const = Constants(0.0,343.0)
 V = steeringvectors(Env,Const,"II")
 
-@time beamformer2(Env,Const,V)
+b = beamformer2(Env,Const,V)
+PSF = pointspreadfunction(Env,Const,V)
 
-Profile.clear()
-@profile beamformer2(Env,Const,V)
-open("profile.txt", "w") do s
-    Profile.print(IOContext(s, :displaysize => (300, 2000)))
-end
+@time fista(PSF, b, zeros(Env.Nx,Env.Ny),10)
 
 #=
 using GR
