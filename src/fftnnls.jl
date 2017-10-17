@@ -30,8 +30,8 @@ function fftnnls(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64) wher
     end
 
     # Warm-start:
-    #Threads.@threads for i in Nf:-1:1
-    #    Y[:,:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit)
+    #for i in Nf:-1:1
+    #    Y[:,:,i],obj[:,i] = fftnnls(psf[:,:,i],b[:,:,i],Xprev,maxit)
     #    Xprev = reshape(Y[:,:,i],Nx,Ny)
     #end
     return X,obj
