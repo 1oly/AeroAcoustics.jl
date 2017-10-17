@@ -61,7 +61,7 @@ function fista(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,tol::T=
     return Y,obj
 end
 
-function fistalasso(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,tol::T=1e-8,lambda::T) where T <: AbstractFloat
+function fistalasso(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,lambda::T,tol::T=1e-7) where T <: AbstractFloat
     obj = zeros(maxit)
     Nx,Ny = size(X0)
     beta = maximum(abs.(fft(psf)))^2
@@ -84,12 +84,12 @@ function fistalasso(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,to
         #X = max.(0.0,Z-gamma.*gradf)
         alpha = k/(k+1+a)
         Z = X + alpha.*(X-Xprev)
-        obj[k] = 0.5*vecnorm(ifft(fpsf.*fft(Z))-b)^2
+        obj[k] = 0.5*sum(abs2,ifft(fpsf.*fft(Z))-b)
     end
     return X,obj
 end
 
-function fistalasso(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,tol::T=1e-8,lambda::T) where T <: AbstractFloat
+function fistalasso(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,lambda::T,tol::T=1e-7) where T <: AbstractFloat
     Y = similar(b)
     Nx,Ny,Nf = size(b)
     Xprev = copy(X0)
@@ -100,7 +100,7 @@ function fistalasso(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,to
 
     # Warm-start:
     for i in Nf:-1:1
-        Y[:,:,i],obj[:,i] = fistalasso(psf[:,:,i],b[:,:,i],Xprev,maxit,lambda)
+        Y[:,:,i],obj[:,i] = fistalasso(psf[:,:,i],b[:,:,i],Xprev,maxit,lambda,tol)
         Xprev = reshape(Y[:,:,i],Nx,Ny)
     end
     return Y,obj
