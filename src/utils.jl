@@ -47,7 +47,7 @@ function beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata)
     fn = fc[(fc.>=fl) .& (fc.<=fu)]
     ind = findin(fc,fn)
     csm = convert(Array{Complex{Float64},3},csmdata["csmReal"][ind,:,:]+im*csmdata["csmImaginary"][ind,:,:])
-    csm .*= 2   # To attain correct level. TODO!
+    #csm .*= 2   # To attain correct level. TODO!
     Nf = length(ind)
     return Environment(N,M,Nx,Ny,Nz,Nf,fn,micgeom,rx,ry,rz,Rxy,D0,D,csm)
 end

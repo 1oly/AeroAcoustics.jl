@@ -42,5 +42,5 @@ function pointspreadfunction(E::Environment{T},C::Constants,V::SteeringMatrix{T}
         end
     end
 
-    return reshape(PSF,E.Nx,E.Ny,E.Nf)
+    return reshape(0.5*PSF,E.Nx,E.Ny,E.Nf)
 end
