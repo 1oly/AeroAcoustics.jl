@@ -78,3 +78,23 @@ function steeringvectors(E::Environment{T},C::Constants{T},kind::String="III") w
     end
     return SteeringMatrix(vi,kind) # [mics,gridpoints,freqs]
 end
+
+# TODO: Make changes to get keys(SourcePos) and values(SourcePos)
+function sourceintegration(res::Array{T,3},SourcePositions::S,E::Environment{T},fco::Array{T,1},intarea::Tuple) where {T <: AbstractFloat, S<: Dict}
+    SourceInt = Dict{String, Array{T,1}}()
+    SourceInt["fco"] = fco
+    srcint = similar(fco)
+    fl,fu = octavebandlimits(fco,3) # Calculate third-octave band limits
+    idx,idy = round(Int64,1/Env.rx.step.hi),round(Int64,1/Env.ry.step.hi)
+    dxint,dyint = round(Int64,intarea[1]/2Env.rx.step.hi),round(Int64,intarea[2]/2Env.ry.step.hi)
+    for src in SourcePos
+        indx,indy = round(Int64,idx*abs(Env.rx[1]-src[2]["xy"][1]))+1,round(Int64,idy*abs(Env.ry[1]-src[2]["xy"][2]))+1
+        for i in 1:length(fco)
+            fn = Env.f[(Env.f.>=fl[i]) .& (Env.f.<=fu[i])]
+            ind = findin(Env.f,fn)
+            srcint[i] = SPL(sum(res[indx-dxint:indx+dxint,indy-dyint:indy+dyint,ind]))
+        end
+        SourceInt[src[1]] = srcint
+    end
+    return SourceInt
+end
