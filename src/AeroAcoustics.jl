@@ -16,7 +16,7 @@ export Constants,
        octavebandlimits,
        beamformer,
        beamformer_corr,
-       beamformer2,
+       #beamformer_old,
        beamformersetup,
        steeringvectors,
        pointspreadfunction,
@@ -28,12 +28,11 @@ export Constants,
 include("types.jl")
 include("utils.jl")
 include("beamformer.jl")
-include("beamformer2.jl")
+include("pointspreadfunction.jl")
+#include("beamformer_old.jl")
 include("beamformer_corr.jl")
 include("cmf.jl")
 include("fista.jl")
 include("fftnnls.jl")
 
-# precompile beamformer
-#precompile(beamformer2, (Environment{Float64},Constants{Float64},SteeringMatrix{Float64}));
 end
