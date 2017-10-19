@@ -4,7 +4,7 @@ struct Constants{T<:Real} <: WindTunnelType
     Ma::T   # Mach number
     c::T    # Speed of sound
 end
-
+# TODO: Should Environment have a dx,dy field?
 struct Environment{T<:AbstractFloat} <: WindTunnelType
     N::Int64
     M::Int64
