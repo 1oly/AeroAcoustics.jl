@@ -79,22 +79,21 @@ function steeringvectors(E::Environment{T},C::Constants{T},kind::String="III") w
     return SteeringMatrix(vi,kind) # [mics,gridpoints,freqs]
 end
 
-# TODO: Make changes to get keys(SourcePos) and values(SourcePos)
 function sourceintegration(res::Array{T,3},SourcePositions::S,E::Environment{T},fco::Array{T,1},intarea::Tuple) where {T <: AbstractFloat, S<: Dict}
     SourceInt = Dict{String, Array{T,1}}()
     SourceInt["fco"] = fco
-    srcint = similar(fco)
     fl,fu = octavebandlimits(fco,3) # Calculate third-octave band limits
     idx,idy = round(Int64,1/E.rx.step.hi),round(Int64,1/E.ry.step.hi)
     dxint,dyint = round(Int64,intarea[1]/2E.rx.step.hi),round(Int64,intarea[2]/2E.ry.step.hi)
-    for src in SourcePos
-        indx,indy = round(Int64,idx*abs(E.rx[1]-src[2]["xy"][1]))+1,round(Int64,idy*abs(E.ry[1]-src[2]["xy"][2]))+1
+    for (key,value) in SourcePositions
+        indx,indy = round(Int64,idx*abs(E.rx[1]-value["xy"][1]))+1,round(Int64,idy*abs(E.ry[1]-value["xy"][2]))+1
+        srcint = similar(fco)   # TODO: Check why it produces a bug if defined outside outer loop
         for i in 1:length(fco)
             fn = E.f[(E.f.>=fl[i]) .& (E.f.<=fu[i])]
             ind = findin(E.f,fn)
             srcint[i] = SPL(sum(res[indx-dxint:indx+dxint,indy-dyint:indy+dyint,ind]))
         end
-        SourceInt[src[1]] = srcint
+        SourceInt[key] = srcint
     end
     return SourceInt
 end
