@@ -5,7 +5,6 @@ function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,tol::T=
     t = 1.
     Nx,Ny = size(X)
     obj = zeros(maxit)
-    psft = transpose(psf)
     center = round(Int64,Nx/2)+1,round(Int64,Ny/2)+1
     Fps = fft(circshift(psf,center))
     FpsT = fft(circshift(psf',center))
@@ -49,11 +48,12 @@ function fista(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,tol::T=
     Nx,Ny,Nf = size(b)
     Xprev = copy(X0)
     obj = zeros(maxit,Nf)
-    #for i in 1:Nf
+    # Threads.@threads for i in 1:Nf
     #    Y[:,:,i],obj[:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit,tol)
     #end
 
     # Warm-start:
+    # TODO: How to use threads with warm-start?
     for i in Nf:-1:1
         Y[:,:,i],obj[:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit,tol)
         Xprev = reshape(Y[:,:,i],Nx,Ny)
@@ -94,7 +94,7 @@ function fistalasso(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,la
     Nx,Ny,Nf = size(b)
     Xprev = copy(X0)
     obj = zeros(maxit,Nf)
-    #for i in 1:Nf
+    #Threads.@threads for i in 1:Nf
     #    Y[:,:,i],obj[:,i] = fistalasso(psf[:,:,i],b[:,:,i],Xprev,maxit,lambda)
     #end
 
