@@ -3,6 +3,7 @@ abstract type WindTunnelType end
 struct Constants{T<:Real} <: WindTunnelType
     Ma::T   # Mach number
     c::T    # Speed of sound
+    h::T    # Shear layer distance from mic array
 end
 # TODO: Should Environment have a dx,dy field?
 struct Environment{T<:AbstractFloat} <: WindTunnelType
