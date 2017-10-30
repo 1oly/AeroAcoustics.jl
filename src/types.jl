@@ -26,5 +26,5 @@ end
 
 struct SteeringMatrix{T<:AbstractFloat} <: WindTunnelType
     v::Array{Complex{T},3}
-    kind::AbstractString
+    kind::Any
 end
