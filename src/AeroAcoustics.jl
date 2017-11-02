@@ -1,6 +1,6 @@
 __precompile__()
 module AeroAcoustics
-using NLsolve, Distances
+using NLsolve, Distances, DSP
 
 import Base.length,
        Base.push!,
@@ -22,12 +22,14 @@ export Constants,
        pointspreadfunction,
        sourceintegration,
        fista,
+       csm,
        fftnnls,
        shear,
        fistalasso
 
 include("types.jl")
 include("utils.jl")
+include("csm.jl")
 include("beamformer.jl")
 include("pointspreadfunction.jl")
 #include("beamformer_old.jl")
