@@ -2,7 +2,7 @@ function csm(t::AbstractArray{T}) where T <: AbstractFloat
     const n = 1024
     const noverlap = div(n,2)
     const fs = 51200
-    const win = hanning(n)
+    const win = DSP.hanning(n)
     const nout = div((size(t,1) - n), n - noverlap)+1
     const M = size(t,2)
     const Nf = div(n,2)+1
