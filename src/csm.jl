@@ -8,12 +8,12 @@ function csm(t::AbstractArray{T}) where T <: AbstractFloat
     const Nf = div(n,2)+1
     const weight = dot(win,win)
 
-    Pxy = zeros(Complex{T},Nf)
-    C = zeros(Complex{T},Nf,M,M)
+    Pxy = Array{Complex{T}}(Nf)
+    C = Array{Complex{T}}(Nf,M,M)
 
     for m in 1:M
         for j in m:M
-            Pxy = mean(conj(DSP.stft(t[:,m], n, noverlap; fs=fs, window=win, onesided=true)).*DSP.stft(t[:,j], n, noverlap; fs=fs, window=win, onesided=true),2)
+            mean!(Pxy,conj!(DSP.stft(t[:,m], n, noverlap; fs=fs, window=win, onesided=true)).*DSP.stft(t[:,j], n, noverlap; fs=fs, window=win, onesided=true))
             for ω in 1:Nf
                 C[ω,j,m] = Pxy[ω]
             end
