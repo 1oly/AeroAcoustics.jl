@@ -94,10 +94,13 @@ function beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata::CrossSpectralMatrix{T}) 
     return Environment(N,M,Nx,Ny,Nz,Nf,fn,micgeom,rx,ry,rz,Rxy,D0,D,C)
 end
 
-function steeringvectors(E::Environment{T},C::Constants{T},kind::Int=3) where T <: AbstractFloat
+function steeringvectors(E::Environment{T},C::Constants{T},kind::Kind) where T <: AbstractFloat
+    isa(kind, Kind) && kind.style != :type2 && kind.style != :type3 && kind.style != :shear && throw(ArgumentError("unknown steering vector type..."))
+
     kw = 2pi*E.f/C.c
-    vi = Array{Complex{Float64}}(E.M,E.N,length(E.f))
-    if kind == 3
+    vi = Array{Complex{T}}(E.M,E.N,length(E.f))
+
+    if kind == Kind(:type3)
         Dsum = sum(1./E.D.^2,2)
         for j in 1:length(E.f)
             for i in eachindex(E.D0)
@@ -106,7 +109,7 @@ function steeringvectors(E::Environment{T},C::Constants{T},kind::Int=3) where T 
                 end
             end
         end
-    elseif kind == 2
+    elseif kind == Kind(:type2)
         for j in 1:length(E.f)
             for i in eachindex(E.D0)
                 for m in 1:E.M
@@ -115,36 +118,37 @@ function steeringvectors(E::Environment{T},C::Constants{T},kind::Int=3) where T 
             end
         end
     end
+    elseif kind == Kind(:Shear)
+        w = 2pi*E.f
+        t = Array{T}(E.M,E.N)
+        xm = Array{T}(3)
+        xm[3] = 0.0
+        for i in eachindex(E.D0)
+            for m in 1:E.M
+                xm[1:2] .= E.micgeom[1:2,m]-E.Rxy[1:2,i]
+                res = nlsolve((x,fvec)->shear!(x,fvec,xm,C), [ 1.; 1.; 1.])
+                xi = res.zero
+                r1 = sqrt(xi[1]^2+xi[2]^2+xi[3]^2)  # From 0 to shear interface
+                d = xi[1]*C.Ma*C.c/r1
+                c1 = d + sqrt(d^2+C.c^2-(C.Ma*C.c)^2)
+                r2 = sqrt((xm[1]-xi[1])^2+(xm[2]-xi[2])^2+(xm[3]-xi[3])^2)
+                t[m,i] = r1/c1 + r2/C.c
+            end
+        end
+        for j in 1:length(E.f)
+            for i in eachindex(E.D0)
+                for m in 1:E.M  # Type II with shear layer
+                    vi[m,i,j] = (1/E.M)*(t[m,i]*C.c/E.D0[i])*exp(-im*w[j]*t[m,i])
+                end
+            end
+        end
     return SteeringMatrix(vi,kind) # [mics,gridpoints,freqs]
 end
 
-function steeringvectors(E::Environment{T},C::Constants{T},kind::String="Shear") where T <: AbstractFloat
-    w = 2pi*E.f
-    vi = Array{Complex{Float64}}(E.M,E.N,length(E.f))
-    t = Array{Float64}(E.M,E.N)
-    xm = Array{Float64}(3)
-    xm[3] = 0.0
-    for i in eachindex(E.D0)
-        for m in 1:E.M
-            xm[1:2] .= E.micgeom[1:2,m]-E.Rxy[1:2,i]
-            res = nlsolve((x,fvec)->shear!(x,fvec,xm,C), [ 1.; 1.; 1.])
-            xi = res.zero
-            r1 = sqrt(xi[1]^2+xi[2]^2+xi[3]^2)  # From 0 to shear interface
-            d = xi[1]*C.Ma*C.c/r1
-            c1 = d + sqrt(d^2+C.c^2-(C.Ma*C.c)^2)
-            r2 = sqrt((xm[1]-xi[1])^2+(xm[2]-xi[2])^2+(xm[3]-xi[3])^2)
-            t[m,i] = r1/c1 + r2/C.c
-        end
-    end
-    for j in 1:length(E.f)
-        for i in eachindex(E.D0)
-            for m in 1:E.M  # Type II with shear layer
-                vi[m,i,j] = (1/E.M)*(t[m,i]*C.c/E.D0[i])*exp(-im*w[j]*t[m,i])
-            end
-        end
-    end
-    return SteeringMatrix(vi,kind) # [mics,gridpoints,freqs]
+function steeringvectors(E::Environment{T},C::Constants{T},kind::AbstractString) where T <: AbstractFloat
+    steeringvectors(E,C,typeinstance(kind))
 end
+
 
 function sourceintegration(res::Array{T,3},SourcePositions::S,E::Environment{T},fco::Array{T,1},intarea::Tuple) where {T <: AbstractFloat, S<: Dict}
     SourceInt = Dict{String, Array{T,1}}()

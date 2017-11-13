@@ -1,4 +1,22 @@
 abstract type WindTunnelType end
+abstract type SteeringVectorType end
+
+struct Kind <: SteeringVectorType
+    style::Symbol
+end
+
+Kind() = Kind(:type3)
+
+const valid_types = ("type2", "type3", "shear")
+
+function typeinstance(types::AbstractString)
+    if type ∈ valid_types
+        return Kind(Symbol(type))
+    else
+        throw(ArgumentError("$type not a recognized steering vector type"))
+    end
+end
+typeinstance(b::SteeringVectorType) = b
 
 struct Constants{T<:Real} <: WindTunnelType
     Ma::T   # Mach number
@@ -35,5 +53,5 @@ end
 
 struct SteeringMatrix{T<:AbstractFloat} <: WindTunnelType
     v::Array{Complex{T},3}
-    kind::Any
+    kind::Kind
 end
