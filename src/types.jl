@@ -5,6 +5,14 @@ struct Constants{T<:Real} <: WindTunnelType
     c::T    # Speed of sound
     h::T    # Shear layer distance from mic array
 end
+
+struct CrossSpectralMatrix{T<:AbstractFloat} <: WindTunnelType
+    csmReal::Array{T,3}
+    csmImag::Array{T,3}
+    binCenterFrequenciesHz::Array{T,1}
+    diagrm::Bool
+end
+
 # TODO: Should Environment have a dx,dy field?
 struct Environment{T<:AbstractFloat} <: WindTunnelType
     N::Int64
@@ -21,7 +29,8 @@ struct Environment{T<:AbstractFloat} <: WindTunnelType
     Rxy::Array{T,2}
     D0::Array{T,1}
     D::Array{T,2}
-    CSM::Array{Complex{T},3}
+    #CSM::Array{Complex{T},3}
+    CSM::CrossSpectralMatrix{T}
 end
 
 struct SteeringMatrix{T<:AbstractFloat} <: WindTunnelType

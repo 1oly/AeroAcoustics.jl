@@ -1,6 +1,6 @@
-__precompile__()
+#__precompile__()
 module AeroAcoustics
-using NLsolve, Distances, DSP
+using NLsolve, Distances, DSP, JuMP, SCS, HDF5
 
 import Base.length,
        Base.push!,
@@ -9,6 +9,7 @@ import Base.length,
        #ImageFiltering.Fill
 
 export Constants,
+       CrossSpectralMatrix,
        Environment,
        SteeringMatrix,
        cmf,
@@ -18,11 +19,13 @@ export Constants,
        beamformer_corr,
        #beamformer_old,
        beamformersetup,
+       parseHDF5data,
        steeringvectors,
        pointspreadfunction,
        sourceintegration,
        fista,
        csm,
+       diagrm!,
        fftnnls,
        shear,
        fistalasso

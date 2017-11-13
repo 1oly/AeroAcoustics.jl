@@ -52,8 +52,49 @@ function beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata)
     return Environment(N,M,Nx,Ny,Nz,Nf,fn,micgeom,rx,ry,rz,Rxy,D0,D,csm)
 end
 
+function promote_array(arrays...)
+  eltype = Base.promote_eltype(arrays...)
+  tuple([convert(Array{eltype}, array) for array in arrays]...)
+end
 
-function steeringvectors(E::Environment{T},C::Constants{T},kind::Int64=3) where T <: AbstractFloat
+function parseHDF5data(filename::String)
+    # TODO: Micgeom and time-data
+    data = read(HDF5.h5open(filename))
+    CSM = data["CsmData"]
+    CSMreal,CSMimag,binfc = promote_array(CSM["csmReal"],CSM["csmImaginary"],CSM["binCenterFrequenciesHz"])
+    return CrossSpectralMatrix(CSMreal,CSMimag,binfc,false)
+end
+
+function beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata::CrossSpectralMatrix{T}) where T <: AbstractFloat
+    const Nm, M = size(micgeom)
+    # Region of interest
+    rx = x[1]:dx:x[2]
+    ry = y[1]:dy:y[2]
+    rz = z  # TODO: Make 3D capabilities?
+
+    Nx = length(rx)
+    Ny = length(ry)
+    Nz = length(rz)
+
+    fl = f[1]
+    fu = f[end]
+
+    Rxy = hcat([[x, y, z] for x in rx, y in ry, z in rz]...)
+    D0 = colwise(Euclidean(), Rxy, [0,0,0]) # Distance from center of array to grid points
+    if Nm == 2
+        micgeom = [micgeom; zeros(M)']
+    end
+    D = pairwise(Euclidean(), Rxy, micgeom) # Distance from each mic to grid points
+    const N = size(D,1)
+    fc = csmdata.binCenterFrequenciesHz
+    fn = fc[(fc.>=fl) .& (fc.<=fu)]
+    ind = findin(fc,fn)
+    C = CrossSpectralMatrix(csm.csmReal,csm.csmImag,fn,false)
+    Nf = length(ind)
+    return Environment(N,M,Nx,Ny,Nz,Nf,fn,micgeom,rx,ry,rz,Rxy,D0,D,C)
+end
+
+function steeringvectors(E::Environment{T},C::Constants{T},kind::Int=3) where T <: AbstractFloat
     kw = 2pi*E.f/C.c
     vi = Array{Complex{Float64}}(E.M,E.N,length(E.f))
     if kind == 3
@@ -111,13 +152,13 @@ function sourceintegration(res::Array{T,3},SourcePositions::S,E::Environment{T},
     fl,fu = octavebandlimits(fco,3) # Calculate third-octave band limits
     idx,idy = round(Int64,1/E.rx.step.hi),round(Int64,1/E.ry.step.hi)
     dxint,dyint = round(Int64,intarea[1]/2E.rx.step.hi),round(Int64,intarea[2]/2E.ry.step.hi)
+    srcint = similar(fco)
     for (key,value) in SourcePositions
         indx,indy = round(Int64,idx*abs(E.rx[1]-value["xy"][1]))+1,round(Int64,idy*abs(E.ry[1]-value["xy"][2]))+1
-        srcint = similar(fco)   # TODO: Check why it produces a bug if defined outside outer loop
         for i in 1:length(fco)
             fn = E.f[(E.f.>=fl[i]) .& (E.f.<=fu[i])]
             ind = findin(E.f,fn)
-            srcint[i] = SPL(sum(res[indx-dxint:indx+dxint,indy-dyint:indy+dyint,ind]))
+            copy!(srcint[i],SPL(sum(res[indx-dxint:indx+dxint,indy-dyint:indy+dyint,ind])))
         end
         SourceInt[key] = srcint
     end

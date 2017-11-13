@@ -7,6 +7,8 @@ function csm(t::AbstractArray{T}) where T <: AbstractFloat
     const M = size(t,2)
     const Nf = div(n,2)+1
     const weight = dot(win,win)
+    const df = div(fs,n)
+    const nspec = div(n,2)
 
     Pxy = Array{Complex{T}}(Nf)
     C = Array{Complex{T}}(Nf,M,M)
@@ -25,5 +27,28 @@ function csm(t::AbstractArray{T}) where T <: AbstractFloat
     for ω in 1:Nf
         C[ω,:,:] = Hermitian(C[ω,:,:],:L)
     end
-    return C
+
+    return CrossSpectralMatrix(real.(C),imag.(C),Array{T,1}([k*df for k in 0:nspec]),false)
+    #return C
+end
+
+# TODO: diagrm! Not finished!!
+function diagrm!(csm::CrossSpectralMatrix{T}) where T <: AbstractFloat
+    Nf,M,M = size(csm.csmReal)
+    m = JuMP.Model(solver = SCS.SCSSolver())
+    JuMP.@variable(m,d[1:2M])
+    JuMP.@objective(m,Min,sum(d))
+    D = diagm(d)
+    for ω in 1:Nf
+        # TODO: Make imag_expand!() and call that here:
+        C = [csm.csmReal[ω,:,:] -csm.csmImag[ω,:,:]; csm.csmImag[ω,:,:] csm.csmReal[ω,:,:]]
+        JuMP.@SDconstraint(m,(C+D>=0))
+        JuMP.solve(m)
+        dopt = JuMP.getvalue(d)
+        for i in 1:M
+            csm.csmReal[ω,i,i] += dopt[i]
+        end
+        #csm.csmImag[ω,:,:] += diagm(dopt[M+1:2M])
+    end
+    return CrossSpectralMatrix(csm.csmReal,csm.csmImag,csm.binCenterFrequenciesHz,true)
 end
