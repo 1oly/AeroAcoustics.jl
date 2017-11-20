@@ -1,31 +1,27 @@
-function pointspreadfunction(E::Environment{T},C::Constants,V::SteeringMatrix{T}) where T <: AbstractFloat
+function pointspreadfunction(E::Environment{T},C::Constants,V::SteeringMatrix{T,S}) where {T <: AbstractFloat, S <: SteeringVectorType}
     PSF = Array{T}(E.N,E.Nf)
     gm = Array{Complex{T}}(E.M)
-    cent::Int64 = round(Int64,E.N/2)+1
+    cent = Int.(round.(E.N/2))+1
+    psf!(PSF,E,C,V,gm,cent,V.kind)
+    return reshape(0.5*PSF,E.Nx,E.Ny,E.Nf)
+end
 
-    if V.kind == "II"
-        for j in 1:length(E.f)
-            gm = E.M*V.v[:,cent,j].*(E.D0[cent]./E.D[cent,:]) # Compensate to get correct level: Type II
-            for i in eachindex(E.D0)
-                PSF[i,j] = abs2(V.v[:,i,j]'*gm)
-            end
-        end
-    elseif V.kind == "III"
-        for j in 1:length(E.f)
-            gm = E.M*V.v[:,cent,j]
-            for i in eachindex(E.D0)
-                PSF[i,j] = abs2(V.v[:,i,j]'*gm)
-            end
-        end
-    else
-        warn("Unknown steering vector type...")
-        for j in 1:length(E.f)
-            gm = V.v[:,cent,j]
-            for i in eachindex(E.D0)
-                PSF[i,j] = abs2(V.v[:,i,j]'*gm)
-            end
+function psf!(PSF,E,C,V,gm,cent,kind::Type2)
+    for j in 1:length(E.f)
+        gm = E.M*V.v[:,cent,j].*(E.D0[cent]./E.D[cent,:])
+        for i in eachindex(E.D0)
+            PSF[i,j] = abs2(V.v[:,i,j]'*gm)
         end
     end
+    return PSF
+end
 
-    return reshape(0.5*PSF,E.Nx,E.Ny,E.Nf)
+function psf!(PSF,E,C,V,gm,cent,kind::Type3)
+    for j in 1:length(E.f)
+        gm = E.M*V.v[:,cent,j]
+        for i in eachindex(E.D0)
+            PSF[i,j] = abs2(V.v[:,i,j]'*gm)
+        end
+    end
+    return PSF
 end

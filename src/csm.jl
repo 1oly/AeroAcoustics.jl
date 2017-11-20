@@ -32,6 +32,21 @@ function csm(t::AbstractArray{T}) where T <: AbstractFloat
     #return C
 end
 
+function csm(::Type{T},filename::AbstractString) where T<:AbstractFloat
+    time_data = h5open(filename, "r") do file
+        read(file, "MicrophoneData/microphoneDataPa")
+    end
+    if T != eltype(time_data)
+        csm(Array{T,2}(time_data))
+    else
+        csm(time_data)
+    end
+end
+
+function csm(filename::AbstractString)
+    csm(Float64,filename)
+end
+
 # TODO: diagrm! Not finished!!
 function diagrm!(csm::CrossSpectralMatrix{T}) where T <: AbstractFloat
     Nf,M,M = size(csm.csmReal)

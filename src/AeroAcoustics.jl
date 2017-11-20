@@ -32,6 +32,7 @@ export Constants,
 
 include("types.jl")
 include("utils.jl")
+include("steeringvectors.jl")
 include("csm.jl")
 include("beamformer.jl")
 include("pointspreadfunction.jl")

@@ -22,50 +22,30 @@ function octavebandlimits(fc,kind)
     return fl, fu
 end
 
-function beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata)
-    const Nm, M = size(micgeom)
-    # Region of interest
-    rx = x[1]:dx:x[2]
-    ry = y[1]:dy:y[2]
-    rz = z  # TODO: Make 3D capabilities?
-
-    Nx = length(rx)
-    Ny = length(ry)
-    Nz = length(rz)
-
-    fl = f[1]
-    fu = f[end]
-
-    Rxy = hcat([[x, y, z] for x in rx, y in ry, z in rz]...)
-    D0 = colwise(Euclidean(), Rxy, [0,0,0]) # Distance from center of array to grid points
-    if Nm == 2
-        micgeom = [micgeom; zeros(M)']
-    end
-    D = pairwise(Euclidean(), Rxy, micgeom) # Distance from each mic to grid points
-    const N = size(D,1)
-    fc = csmdata["binCenterFrequenciesHz"]
-    fn = fc[(fc.>=fl) .& (fc.<=fu)]
-    ind = findin(fc,fn)
-    csm = convert(Array{Complex{Float64},3},csmdata["csmReal"][ind,:,:]+im*csmdata["csmImaginary"][ind,:,:])
-    #csm .*= 2   # To attain correct level. TODO!
-    Nf = length(ind)
-    return Environment(N,M,Nx,Ny,Nz,Nf,fn,micgeom,rx,ry,rz,Rxy,D0,D,csm)
-end
-
 function promote_array(arrays...)
-  eltype = Base.promote_eltype(arrays...)
-  tuple([convert(Array{eltype}, array) for array in arrays]...)
+    # see: https://stackoverflow.com/a/31235569
+    eltype = Base.promote_eltype(arrays...)
+    tuple([convert(Array{eltype}, array) for array in arrays]...)
 end
 
-function parseHDF5data(filename::String)
-    # TODO: Micgeom and time-data
-    data = read(HDF5.h5open(filename))
-    CSM = data["CsmData"]
-    CSMreal,CSMimag,binfc = promote_array(CSM["csmReal"],CSM["csmImaginary"],CSM["binCenterFrequenciesHz"])
+function promote_array(T,arrays...)
+    # see: https://stackoverflow.com/a/31235569
+    tuple([convert(Array{T}, array) for array in arrays]...)
+end
+
+function parseHDF5data(filename::AbstractString)
+    parseHDF5data(Float64,filename::AbstractString)
+end
+
+function parseHDF5data(::Type{T},filename::AbstractString) where T<:AbstractFloat
+    CSM = h5open(filename, "r") do file
+        read(file, "CsmData")
+    end
+    CSMreal,CSMimag,binfc = promote_array(T,CSM["csmReal"],CSM["csmImaginary"],CSM["binCenterFrequenciesHz"])
     return CrossSpectralMatrix(CSMreal,CSMimag,binfc,false)
 end
 
-function beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata::CrossSpectralMatrix{T}) where T <: AbstractFloat
+function beamformersetup(dx::T,dy::T,x::Vector{T},y::Vector{T},z::T,f::Vector{T},micgeom::Matrix{T},csmdata::CrossSpectralMatrix{T}) where T <: AbstractFloat
     const Nm, M = size(micgeom)
     # Region of interest
     rx = x[1]:dx:x[2]
@@ -82,71 +62,28 @@ function beamformersetup(dx,dy,x,y,z,f,micgeom,csmdata::CrossSpectralMatrix{T}) 
     Rxy = hcat([[x, y, z] for x in rx, y in ry, z in rz]...)
     D0 = colwise(Euclidean(), Rxy, [0,0,0]) # Distance from center of array to grid points
     if Nm == 2
-        micgeom = [micgeom; zeros(M)']
+        micgeom = [micgeom; zeros(T,M)']
     end
     D = pairwise(Euclidean(), Rxy, micgeom) # Distance from each mic to grid points
     const N = size(D,1)
     fc = csmdata.binCenterFrequenciesHz
     fn = fc[(fc.>=fl) .& (fc.<=fu)]
     ind = findin(fc,fn)
-    C = CrossSpectralMatrix(csm.csmReal,csm.csmImag,fn,false)
+    C = CrossSpectralMatrix(csmdata.csmReal[ind,:,:],csmdata.csmImag[ind,:,:],fn,false)
     Nf = length(ind)
     return Environment(N,M,Nx,Ny,Nz,Nf,fn,micgeom,rx,ry,rz,Rxy,D0,D,C)
 end
 
-function steeringvectors(E::Environment{T},C::Constants{T},kind::Kind) where T <: AbstractFloat
-    isa(kind, Kind) && kind.style != :type2 && kind.style != :type3 && kind.style != :shear && throw(ArgumentError("unknown steering vector type..."))
-
-    kw = 2pi*E.f/C.c
-    vi = Array{Complex{T}}(E.M,E.N,length(E.f))
-
-    if kind == Kind(:type3)
-        Dsum = sum(1./E.D.^2,2)
-        for j in 1:length(E.f)
-            for i in eachindex(E.D0)
-                for m in 1:E.M
-                    vi[m,i,j] = 1/(E.D[i,m]*E.D0[i]*Dsum[i])*exp(-im*kw[j]*(E.D[i,m]-E.D0[i]))
-                end
-            end
-        end
-    elseif kind == Kind(:type2)
-        for j in 1:length(E.f)
-            for i in eachindex(E.D0)
-                for m in 1:E.M
-                    vi[m,i,j] = (1/E.M)*(E.D[i,m]/E.D0[i])*exp(-im*kw[j]*(E.D[i,m]-E.D0[i]))
-                end
-            end
-        end
-    end
-    elseif kind == Kind(:Shear)
-        w = 2pi*E.f
-        t = Array{T}(E.M,E.N)
-        xm = Array{T}(3)
-        xm[3] = 0.0
-        for i in eachindex(E.D0)
-            for m in 1:E.M
-                xm[1:2] .= E.micgeom[1:2,m]-E.Rxy[1:2,i]
-                res = nlsolve((x,fvec)->shear!(x,fvec,xm,C), [ 1.; 1.; 1.])
-                xi = res.zero
-                r1 = sqrt(xi[1]^2+xi[2]^2+xi[3]^2)  # From 0 to shear interface
-                d = xi[1]*C.Ma*C.c/r1
-                c1 = d + sqrt(d^2+C.c^2-(C.Ma*C.c)^2)
-                r2 = sqrt((xm[1]-xi[1])^2+(xm[2]-xi[2])^2+(xm[3]-xi[3])^2)
-                t[m,i] = r1/c1 + r2/C.c
-            end
-        end
-        for j in 1:length(E.f)
-            for i in eachindex(E.D0)
-                for m in 1:E.M  # Type II with shear layer
-                    vi[m,i,j] = (1/E.M)*(t[m,i]*C.c/E.D0[i])*exp(-im*w[j]*t[m,i])
-                end
-            end
-        end
-    return SteeringMatrix(vi,kind) # [mics,gridpoints,freqs]
+function beamformersetup(dx::T,dy::T,x::Vector{T},y::Vector{T},z::T,f::Vector{T},micgeom::Matrix{T},csmdata::AbstractString) where T<:AbstractFloat
+    time_data = parseHDF5data(T,csmdata)
+    beamformersetup(dx,dy,x,y,z,f,micgeom,time_data)
 end
 
-function steeringvectors(E::Environment{T},C::Constants{T},kind::AbstractString) where T <: AbstractFloat
-    steeringvectors(E,C,typeinstance(kind))
+
+function beamformersetup(dx::A,dy::B,x::Vector{C},y::Vector{D},z::E,f::Vector{F},micgeom::Matrix{G},csmdata::AbstractString) where {A,B,C,D,E,F,G}
+    Tc = promote_type(A,B,C,D,E,F,G)
+    time_data = parseHDF5data(Tc,csmdata)
+    beamformersetup(Tc(dx),Tc(dy),Vector{Tc}(x),Vector{Tc}(y),Tc(z),Vector{Tc}(f),Matrix{Tc}(micgeom),time_data)
 end
 
 
@@ -154,11 +91,11 @@ function sourceintegration(res::Array{T,3},SourcePositions::S,E::Environment{T},
     SourceInt = Dict{String, Array{T,1}}()
     SourceInt["fco"] = fco
     fl,fu = octavebandlimits(fco,3) # Calculate third-octave band limits
-    idx,idy = round(Int64,1/E.rx.step.hi),round(Int64,1/E.ry.step.hi)
-    dxint,dyint = round(Int64,intarea[1]/2E.rx.step.hi),round(Int64,intarea[2]/2E.ry.step.hi)
+    idx,idy = Int.(round.(1/E.rx.step.hi)),Int.(round.(1/E.ry.step.hi))
+    dxint,dyint = Int.(round.(intarea[1]/2E.rx.step.hi)),Int.(round.(intarea[2]/2E.ry.step.hi))
     srcint = similar(fco)
     for (key,value) in SourcePositions
-        indx,indy = round(Int64,idx*abs(E.rx[1]-value["xy"][1]))+1,round(Int64,idy*abs(E.ry[1]-value["xy"][2]))+1
+        indx,indy = Int.(round.(idx*abs(E.rx[1]-value["xy"][1])))+1,Int.(round.(idy*abs(E.ry[1]-value["xy"][2])))+1
         for i in 1:length(fco)
             fn = E.f[(E.f.>=fl[i]) .& (E.f.<=fu[i])]
             ind = findin(E.f,fn)
