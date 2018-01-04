@@ -3,7 +3,7 @@ function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,tol::T=
     Xprev = X
     Y = X
     t = 1.
-    Nx,Ny = size(X)
+    const Nx,Ny = size(X)
     obj = zeros(maxit)
     center = round(Int64,Nx/2)+1,round(Int64,Ny/2)+1
     Fps = fft(circshift(psf,center))
@@ -13,8 +13,9 @@ function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,tol::T=
         s = ifft(fft(s).*Fps)/vecnorm(s)
         #s = imfilter(s,centered(psf))/vecnorm(s)
     end
-    L = vecnorm(s)^2
-    beta = 1./L
+    const L = vecnorm(s)^2
+    const beta = 1./L
+    #const lenx = length(X[:])
     r = real(ifft(Fps.*fft(Y)))-b
     #r = imfilter(Y,centered(psf),Fill(zero(eltype(Y))),Algorithm.FFT())-b
     gradY = real(ifft(FpsT.*fft(r)))
@@ -30,11 +31,14 @@ function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,tol::T=
         #r = imfilter(Y,centered(psf),Fill(zero(eltype(Y))),Algorithm.FFT())-b
         gradY = real(ifft(FpsT.*fft(r)))
         #gradY = imfilter(r,centered(psft),Fill(zero(eltype(r))),Algorithm.FFT())
-        if norm(X - Xprev,1)/length(X[:]) <= tol
-            break
-        end
+        #if norm(X - Xprev,1)/lenx <= tol
+        #    break
+        #end
         Xprev = X
         t = tnew
+        if norm(Y-X, Inf)/beta <= tol*(1+norm(X, Inf))
+            break
+        end
         #if norm(Y-X, Inf)/beta <= tol*(1+norm(X, Inf))
         #    println("Tolerance met at iteration $k ")
         #    break
@@ -45,7 +49,7 @@ end
 
 function fista(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,tol::T=1e-8) where T <: AbstractFloat
     Y = similar(b)
-    Nx,Ny,Nf = size(b)
+    const Nx,Ny,Nf = size(b)
     Xprev = copy(X0)
     obj = zeros(maxit,Nf)
     # Threads.@threads for i in 1:Nf
@@ -63,7 +67,7 @@ end
 
 function fistalasso(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,lambda::T,tol::T=1e-7) where T <: AbstractFloat
     obj = zeros(maxit)
-    Nx,Ny = size(X0)
+    const Nx,Ny = size(X0)
     beta = maximum(abs.(fft(psf)))^2
     center = round(Int64,Nx/2)+1,round(Int64,Ny/2)+1
     fpsf = fft(circshift(psf,center))
