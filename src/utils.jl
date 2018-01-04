@@ -1,10 +1,10 @@
-function SPL{T}(p::Array{T})
+function SPL(p::Array{T}) where T <: Real
     s = similar(p)
     s[p.>0] = 10*log10.(p[p.>0]/4e-10)
     s[p.<=0] = -350
     return s
 end
-SPL(p::Number) = 10*log10(p/4e-10)
+SPL(p::Number) = p > 0.0 ? 10*log10(p/4e-10) : -350.0
 
 function shear!(xi,fvec,xm,C::Constants{T}) where T <: AbstractFloat
     a = sqrt(xi[1]^2+(1-C.Ma^2)*(xi[2]^2+xi[3]^2))
@@ -99,9 +99,9 @@ function sourceintegration(res::Array{T,3},SourcePositions::S,E::Environment{T},
         for i in 1:length(fco)
             fn = E.f[(E.f.>=fl[i]) .& (E.f.<=fu[i])]
             ind = findin(E.f,fn)
-            copy!(srcint[i],SPL(sum(res[indx-dxint:indx+dxint,indy-dyint:indy+dyint,ind])))
+            srcint[i] = SPL(sum(res[indx-dxint:indx+dxint,indy-dyint:indy+dyint,ind]))
         end
-        SourceInt[key] = srcint
+        SourceInt[key] = copy(srcint)
     end
     return SourceInt
 end
