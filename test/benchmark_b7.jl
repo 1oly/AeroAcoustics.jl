@@ -32,26 +32,42 @@ z = 0.75                # Measurement distance
 Env1 = beamformersetup(dx,dy,x,y,z,[fl[1];fu[end]],micgeom,csm_Ref)
 
 # or alternatively use time_data:
-C = csm(time_path)
+#C = csm(time_path)
 
-Env2 = beamformersetup(dx,dy,x,y,z,[fl[1];fu[end]],micgeom,C)
+#Env2 = beamformersetup(dx,dy,x,y,z,[fl[1];fu[end]],micgeom,C)
 
 # Declare constants:
 Const = Constants(0.0,343.0)
 
 # Calculate steering vectors:
 V1 = steeringvectors(Env1,Const)
-V2 = steeringvectors(Env2,Const)
+#V2 = steeringvectors(Env2,Const)
 
 # Calculate beamformer output and point-spread function:
 b1 = beamformer(Env1,Const,V1)
-b2 = beamformer(Env2,Const,V2)
-PSF = pointspreadfunction(Env,Const,V)
+#b2 = beamformer(Env2,Const,V2)
+PSF = pointspreadfunction(Env1,Const,V1)
 
+indf = 40
+figure(size=(600,600))
+#subplot(1,2,1)
+contourf(Env1.rx,Env1.ry,SPL(b1[:,:,indf]),title="Beamformer at $(Env1.f[indf]) Hz")
+#subplot(1,2,2)
+#contourf(Env1.rx,Env1.ry,SPL(b2[:,:,indf]))
 
-indf = 10
+# Deconvolution
+
+# Deconvolution without boundary-conditions
+X0 = zeros(Env1.Nx,Env1.Ny)
+x_fistaprox = zeros(Env1.Nx,Env1.Ny,Env1.Nf)
+kmax = 20
+tol = -Inf
+@time fistaprox!(x_fistaprox, PSF, b1, NormL1Pos(1e-2); tol=tol, maxit=kmax);
+@time x_fista,objs = fista(PSF, b1, X0, kmax,tol);
+
 figure(size=(700,300))
+fin = 10
 subplot(1,2,1)
-contourf(Env.rx,Env.ry,SPL(b1[:,:,indf]),title="Beamformer at $(Env.f[indf]) Hz")
+contourf(Env1.rx,Env1.ry,x_fista[:,:,fin])
 subplot(1,2,2)
-contourf(Env.rx,Env.ry,SPL(b2[:,:,indf]))
+contourf(Env1.rx,Env1.ry,x_fistaprox[:,:,fin])
