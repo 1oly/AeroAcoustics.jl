@@ -59,15 +59,20 @@ contourf(Env1.rx,Env1.ry,SPL(b1[:,:,indf]),title="Beamformer at $(Env1.f[indf]) 
 
 # Deconvolution without boundary-conditions
 X0 = zeros(Env1.Nx,Env1.Ny)
-x_fistaprox = zeros(Env1.Nx,Env1.Ny,Env1.Nf)
-kmax = 20
+x_fistaproxL1 = zeros(Env1.Nx,Env1.Ny)
+x_fistaproxL2 = zeros(Env1.Nx,Env1.Ny)
+kmax = 400
+lam = 1e-2
 tol = -Inf
-@time fistaprox!(x_fistaprox, PSF, b1, NormL1Pos(1e-2); tol=tol, maxit=kmax);
-@time x_fista,objs = fista(PSF, b1, X0, kmax,tol);
+@time AeroAcoustics.fistaprox!(x_fistaproxL2, PSF[:,:,1], b1[:,:,1], ProximalOperators.SqrNormL2; tol=tol, maxit=kmax,lam=lam);
+@time AeroAcoustics.fistaprox!(x_fistaproxL1, PSF[:,:,1], b1[:,:,1], ProximalOperators.NormL1; tol=tol, maxit=kmax,lam=lam);
+@time x_fista,objs = fista(PSF[:,:,1], b1[:,:,1], X0, kmax,tol);
 
-figure(size=(700,300))
+figure(size=(1300,300))
 fin = 10
-subplot(1,2,1)
-contourf(Env1.rx,Env1.ry,x_fista[:,:,fin])
-subplot(1,2,2)
-contourf(Env1.rx,Env1.ry,x_fistaprox[:,:,fin])
+subplot(1,3,1)
+contourf(Env1.rx,Env1.ry,x_fista)
+subplot(1,3,2)
+contourf(Env1.rx,Env1.ry,x_fistaproxL1)
+subplot(1,3,3)
+contourf(Env1.rx,Env1.ry,x_fistaproxL2)
