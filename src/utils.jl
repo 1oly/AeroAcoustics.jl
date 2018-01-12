@@ -86,6 +86,7 @@ function beamformersetup(dx::A,dy::B,x::Vector{C},y::Vector{D},z::E,f::Vector{F}
     beamformersetup(Tc(dx),Tc(dy),Vector{Tc}(x),Vector{Tc}(y),Tc(z),Vector{Tc}(f),Matrix{Tc}(micgeom),time_data)
 end
 
+# TODO add 2D sourceintegration!
 
 function sourceintegration(res::Array{T,3},SourcePositions::S,E::Environment{T},fco::Array{T,1},intarea::Tuple) where {T <: AbstractFloat, S<: Dict}
     SourceInt = Dict{String, Array{T,1}}()
@@ -102,6 +103,19 @@ function sourceintegration(res::Array{T,3},SourcePositions::S,E::Environment{T},
             srcint[i] = SPL(sum(res[indx-dxint:indx+dxint,indy-dyint:indy+dyint,ind]))
         end
         SourceInt[key] = copy(srcint)
+    end
+    return SourceInt
+end
+
+function sourceintegration(res::Array{T,2},SourcePositions::S,E::Environment{T},fco::T,intarea::Tuple) where {T <: AbstractFloat, S<: Dict}
+    SourceInt = Dict{String, T}()
+    SourceInt["fco"] = fco
+    #fl,fu = octavebandlimits(fco,3) # Calculate third-octave band limits
+    idx,idy = Int.(round.(1/E.rx.step.hi)),Int.(round.(1/E.ry.step.hi))
+    dxint,dyint = Int.(round.(intarea[1]/2E.rx.step.hi)),Int.(round.(intarea[2]/2E.ry.step.hi))
+    for (key,value) in SourcePositions
+        indx,indy = Int.(round.(idx*abs(E.rx[1]-value["xy"][1])))+1,Int.(round.(idy*abs(E.ry[1]-value["xy"][2])))+1
+        SourceInt[key] = SPL(sum(res[indx-dxint:indx+dxint,indy-dyint:indy+dyint]))
     end
     return SourceInt
 end
