@@ -24,7 +24,7 @@ function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,tol::T=
     while k < maxit
         k += 1
         obj[k] = 0.5*sum(abs2,r)    #0.5vecnorm(r)^2
-        X = max.(0.0,real(Y-beta*gradY))
+        X = max.(0.0,real(Y-beta*gradY))    # TODO: implement nonneg!
         tnew = 0.5*(1.+sqrt.(1.+4.*t^2))
         Y = X + ((t-1.)/tnew)*(X-Xprev)
         r = real(ifft(Fps.*fft(Y)))-b
@@ -47,7 +47,7 @@ function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2},maxit::Int64,tol::T=
     return X,obj
 end
 
-function fista(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,tol::T=1e-8) where T <: AbstractFloat
+function fista(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,tol::T=1e-8;warmstart::Bool=true) where T <: AbstractFloat
     Y = similar(b)
     const Nx,Ny,Nf = size(b)
     Xprev = copy(X0)
@@ -58,9 +58,16 @@ function fista(psf::Array{T,3},b::Array{T,3},X0::Array{T,2},maxit::Int64,tol::T=
 
     # Warm-start:
     # TODO: How to use threads with warm-start?
-    for i in Nf:-1:1
-        Y[:,:,i],obj[:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit,tol)
-        Xprev = reshape(Y[:,:,i],Nx,Ny)
+    if warmstart
+        for i in Nf:-1:1
+            Y[:,:,i],obj[:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit,tol)
+            Xprev = reshape(Y[:,:,i],Nx,Ny)
+        end
+    elseif !warmstart
+        for i in 1:Nf
+            Y[:,:,i],obj[:,i] = fista(psf[:,:,i],b[:,:,i],Xprev,maxit,tol)
+            #Xprev = reshape(Y[:,:,i],Nx,Ny)
+        end
     end
     return Y,obj
 end
