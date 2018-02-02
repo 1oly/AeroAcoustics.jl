@@ -5,8 +5,6 @@ using NLsolve, Distances, DSP, JuMP, SCS, HDF5, ProximalOperators
 import Base.length,
        Base.push!,
        Base.Threads
-       #ImageFiltering.imfilter,
-       #ImageFiltering.Fill
 
 export Constants,
        CrossSpectralMatrix,
@@ -17,7 +15,6 @@ export Constants,
        octavebandlimits,
        beamformer,
        beamformer_corr,
-       #beamformer_old,
        beamformersetup,
        parseHDF5data,
        steeringvectors,
@@ -27,10 +24,9 @@ export Constants,
        fistaprox!,
        nonneg!,
        csm,
-       diagrm!,
+#       diagrm!,
        fftnnls,
-       shear,
-       fistalasso
+       shear
 
 include("types.jl")
 include("utils.jl")
@@ -38,8 +34,7 @@ include("steeringvectors.jl")
 include("csm.jl")
 include("beamformer.jl")
 include("pointspreadfunction.jl")
-#include("beamformer_old.jl")
-include("beamformer_corr.jl")
+#include("beamformer_corr.jl")
 include("cmf.jl")
 include("fista.jl")
 include("fistaprox.jl")
