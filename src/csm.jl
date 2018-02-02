@@ -67,3 +67,14 @@ function diagrm!(csm::CrossSpectralMatrix{T}) where T <: AbstractFloat
     end
     return CrossSpectralMatrix(csm.csmReal,csm.csmImag,csm.binCenterFrequenciesHz,true)
 end
+
+function diagrm_naive!(csm::CrossSpectralMatrix{T}) where T <: AbstractFloat
+    Nf,M,M = size(csm.csmReal)
+    for ω in 1:Nf
+        for i in 1:M
+            csm.csmReal[ω,i,i] = zero(T)
+            csm.csmImag[ω,i,i] = zero(T)
+        end
+    end
+    return CrossSpectralMatrix(csm.csmReal,csm.csmImag,csm.binCenterFrequenciesHz,true)
+end
