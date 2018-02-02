@@ -1,0 +1,5 @@
+image: julia:0.6
+
+default:
+  script: 
+    - julia -e "Pkg.update();Pkg.clone(\"https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl\");Pkg.checkout(\"AeroAcoustics\", \"\$(ENV[\"CI_COMMIT_REF_NAME\"])\");Pkg.test(\"AeroAcoustics\")"
