@@ -1,6 +1,12 @@
 #__precompile__()
 module AeroAcoustics
-using NLsolve, Distances, DSP, JuMP, SCS, HDF5, ProximalOperators
+using NLsolve,
+      Distances,
+      DSP,
+      JuMP,
+      SCS,
+      HDF5,
+      ProximalOperators
 
 import Base.length,
        Base.push!,
