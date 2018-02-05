@@ -1,4 +1,4 @@
 using AeroAcoustics
 using Base.Test
 
-@test_skip "No tests!"
+@test 1==1
