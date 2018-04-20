@@ -1,6 +1,6 @@
 #__precompile__()
 module AeroAcoustics
-using NLsolve,
+using NLsolve
 using Distances
 using DSP
 using JuMP
