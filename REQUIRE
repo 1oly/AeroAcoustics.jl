@@ -1,8 +1,7 @@
 julia 0.6
-NLsolve 
-Distances 
-DSP 
+NLsolve
+Distances
+DSP
 JuMP 
-SCS 
 HDF5
 ProximalOperators

@@ -4,7 +4,7 @@ using NLsolve
 using Distances
 using DSP
 using JuMP
-using SCS
+#using SCS
 using HDF5
 using ProximalOperators
 
