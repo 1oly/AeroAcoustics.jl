@@ -1,7 +1,7 @@
 image: julia:0.6
 
 before_script:
-  - sudo apt-get update -qq && apt-get install -y hdf5-tools
+  - apt-get update -qq && apt-get install git hdf5-tools -y
   - julia build_script.jl
 
 default:
