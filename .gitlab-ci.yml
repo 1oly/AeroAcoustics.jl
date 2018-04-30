@@ -8,3 +8,16 @@ default:
   script:
     - julia -e "Pkg.test(\"AeroAcoustics.jl\"; coverage = true)"
     - julia coverage_script.jl
+
+pages:
+  stage: deploy
+#  script:
+#    - julia -e "Pkg.add(\"Documenter\")" # install Documenter
+#    - julia -e "Pkg.checkout(\"Documenter\"); Pkg.checkout(\"Documenter\", \"mp/fix-url-lines\")"
+#    - julia --color=yes docs/make.jl # make documentation
+#    - mv docs/build public # move to the directory picked up by Gitlab pages
+  artifacts:
+    paths:
+      - public
+  only:
+  - master

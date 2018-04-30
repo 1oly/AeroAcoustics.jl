@@ -1,7 +1,6 @@
-function pointspreadfunction(E::Environment{T},C::Constants,V::SteeringMatrix{T,S}) where {T <: AbstractFloat, S <: SteeringVectorType}
+function pointspreadfunction(E::Environment{T},C::Constants,V::SteeringMatrix{T,S},cent=round.(Int,E.N/2)+1) where {T <: AbstractFloat, S <: SteeringVectorType}
     PSF = Array{T}(E.N,E.Nf)
     gm = Array{Complex{T}}(E.M)
-    cent = Int.(round.(E.N/2))+1
     psf!(PSF,E,C,V,gm,cent,V.kind)
     return reshape(0.5*PSF,E.Nx,E.Ny,E.Nf)
 end
