@@ -1,4 +1,4 @@
 using Base.Test
 using AeroAcoustics
 
-@test 1==1
+@test SPL(0) == -350.0
