@@ -11,7 +11,8 @@ default:
 
 pages:
   stage: deploy
-#  script:
+  script:
+    - Hugo
 #    - julia -e "Pkg.add(\"Documenter\")" # install Documenter
 #    - julia -e "Pkg.checkout(\"Documenter\"); Pkg.checkout(\"Documenter\", \"mp/fix-url-lines\")"
 #    - julia --color=yes docs/make.jl # make documentation
