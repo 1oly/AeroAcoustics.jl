@@ -1,12 +1,8 @@
-function csm(t::AbstractArray{T}) where T <: AbstractFloat
-    const n = 1024
-    const noverlap = div(n,2)
-    const fs = 51200
-    const win = DSP.hanning(n)
+function csm(t::AbstractArray{T};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n)) where T <: AbstractFloat
     const nout = div((size(t,1) - n), n - noverlap)+1
     const M = size(t,2)
     const Nf = div(n,2)+1
-    const weight = dot(win,win)
+    const weight = sum(abs2,win)
     const df = div(fs,n)
     const nspec = div(n,2)
 
