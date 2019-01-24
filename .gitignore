@@ -17,3 +17,7 @@
 *.tmp
 
 .DS_Store
+
+
+test/data/
+readpti.jl
