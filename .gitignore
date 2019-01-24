@@ -11,6 +11,7 @@
 *.jl.*.cov
 *.jl.mem
 *.ji
+*.ipynb_checkpoints
 
 *.pdf
 *.svg
