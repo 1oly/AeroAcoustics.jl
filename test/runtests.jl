@@ -8,7 +8,7 @@ REPO_URL = "https://gitlab.windenergy.dtu.dk/ollyl/aeroacousticsdata/raw/master/
 
 remotefiles = [
     ("data/test1_csm.h5", "8f2ba2948f852cf7e406d4c8ad1988beecc5e437f38c1d9369d502891e8e947a"),
-    ("data/test1_timeseries.h5", "6b940853919c07d3db2e10a9c5c39495698309e0d60ed77dedac9e4a3406a8cc")
+    ("data/test1_timeseries.h5", "1f897db4039138f0c31f9cb340cce3304b85949f9f745200cc161f47426e45ec")
     ]
 
 for (f, sha) in remotefiles
