@@ -11,7 +11,7 @@ function fista(psf::Array{T,2},b::Array{T,2},X0::Array{T,2};maxit::Int64=1000,to
         s = ifft(fft(s).*Fps)/vecnorm(s)
     end
     const L = vecnorm(s)^2
-    const beta = 1./L
+    const beta = 1 ./L
 
     it = 0
     while it < maxit
@@ -42,7 +42,7 @@ function fista(psf::Array{T,3},b::Array{T,3},X0::Array{T,2};maxit::Int64=1000,to
 
     for i in Ind
         Y[:,:,i],it = fista(psf[:,:,i],b[:,:,i],Xprev;maxit=maxit,tol=tol)
-        warmstart? Xprev = reshape(Y[:,:,i],Nx,Ny) : nothing
+        warmstart ? Xprev = reshape(Y[:,:,i],Nx,Ny) : nothing
         push!(d.maxit,it)
     end
     d.xopt, d.tol = Y, tol

@@ -1,49 +1,35 @@
 #__precompile__()
 module AeroAcoustics
-using NLsolve
 using Distances
-using DSP
-using JuMP
-#using SCS
-using HDF5
-using ProximalOperators
+using LinearAlgebra # LinAlg in julia 1.0
+using Statistics
+using Parameters
+import DSP
 
 import Base.length,
        Base.push!,
        Base.Threads
 
-export Constants,
+export Environment,
        CrossSpectralMatrix,
-       Environment,
-       SteeringMatrix,
-       cmf,
        SPL,
-       octavebandlimits,
-       beamformer,
-       beamformer_corr,
-       beamformersetup,
-       parseHDF5data,
        steeringvectors,
-       pointspreadfunction,
-       sourceintegration,
-       fista,
-       fistaprox!,
-       nonneg!,
        csm,
-#       diagrm!,
-       fftnnls,
-       shear
+       beamforming
+
+
 
 include("types.jl")
-include("utils.jl")
 include("steeringvectors.jl")
 include("csm.jl")
-include("beamformer.jl")
-include("pointspreadfunction.jl")
-#include("beamformer_corr.jl")
-include("cmf.jl")
-include("fista.jl")
-include("fistaprox.jl")
-include("fftnnls.jl")
+include("beamforming.jl")
+
+function SPL(p::Array{T}) where T <: Real
+    s = similar(p)
+    s[p.>0] = 10*log10.(p[p.>0]/4e-10)
+    s[p.<=0] = -350
+    return s
+end
+SPL(p::Number) = p > 0.0 ? 10*log10(p/4e-10) : -350.0
 
 end

@@ -9,7 +9,7 @@ function fistaprox!(x::Array{T,2}, psf::Array{T,2}, b::Array{T,2}, g; tol::R=1e-
         s = ifft(fft(s).*Fps)/vecnorm(s)
     end
     const L = vecnorm(s)^2
-    const beta = 1./L
+    const beta = 1 ./L
     #lambda = lam*norm(real(ifft(FpsT.*fft(b))),Inf)
     f = g(lambda)
     it = 0
