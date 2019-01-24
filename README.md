@@ -6,7 +6,7 @@
 
 A [julia](http://julialang.org) package for Aeroacoustics.
 
-This package is under development but has basic working functionality for frequency domain beamforming.
+This package is under development but has basic working functionality for frequency domain beamforming. Here is a small [demonstration](https://nbviewer.jupyter.org/urls/gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/raw/master/examples/Introduction.ipynb) of the current API (subject to change).
 
 The roadmap and todos are tracked in the [roadmap meta-issue](https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/issues/1).
 
