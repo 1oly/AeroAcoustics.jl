@@ -19,6 +19,6 @@
 
 .DS_Store
 
-
+Manifest.toml
 test/data/
 readpti.jl
