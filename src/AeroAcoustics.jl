@@ -1,4 +1,3 @@
-#__precompile__()
 module AeroAcoustics
 using Distances
 using LinearAlgebra # LinAlg in julia 1.0
@@ -11,7 +10,6 @@ import Base.length,
        Base.Threads
 
 export Environment,
-       CrossSpectralMatrix,
        SPL,
        steeringvectors,
        csm,

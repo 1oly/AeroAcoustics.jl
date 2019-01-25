@@ -23,9 +23,3 @@ abstract type AeroAcousticType end
     D0 = colwise(Euclidean(), Rxy, [0,0,0]) # Distance from center of array to grid points
     D = pairwise(Euclidean(), Rxy, micgeom) # Distance from each mic to grid points
 end
-
-struct CrossSpectralMatrix{T1<:AbstractFloat,T2<:AbstractArray} <: AeroAcousticType
-    csm::Array{Complex{T1},3}
-    fc::T2
-    diagrm::Bool
-end
