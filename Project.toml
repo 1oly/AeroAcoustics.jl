@@ -2,7 +2,7 @@ name = "AeroAcoustics"
 uuid = "03ede2b8-90d7-56cb-9af1-359a44c6802d"
 keywords = ["AeroAcoustics"]
 license = "MIT"
-desc = "A package for post-processing af microphone array measurements"
+desc = "A package for post-processing of microphone array measurements"
 authors = ["Oliver Lylloff <ollyl@dtu.dk>"]
 version = "0.0.1"
 
