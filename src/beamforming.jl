@@ -18,3 +18,16 @@ function beamforming(csm::AbstractArray{Complex{T},N},v::AbstractArray{Complex{T
     end
     return b
 end
+
+function beamforming(E::Environment)
+    @unpack CSM,steeringvec,N,Nf,fn,Cinds = E
+    b = Array{Float64, 2}(undef, N, Nf)
+    for j in 1:Nf
+        csmd = selectdim(CSM.arr[:,:,Cinds], 3, j)
+        for i in 1:N
+            vd = @view steeringvec.arr[:,i,j]
+            b[i,j] = real(vd'*csmd*vd)
+        end
+    end
+    return b
+end

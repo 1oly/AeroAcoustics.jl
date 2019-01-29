@@ -12,7 +12,9 @@ import Base.length,
 export Environment,
        SPL,
        steeringvectors,
+       steeringvectors!,
        csm,
+       csm!,
        beamforming
 
 
