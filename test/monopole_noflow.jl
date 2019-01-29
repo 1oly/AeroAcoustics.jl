@@ -38,5 +38,4 @@ import DSP
     s,p = findmax(reshape(b[:,10],21,21))
     @test ceil(SPL(s)) == 48
     @test p.I == (10,12)
-    println("Hello from branch MASTER")
 end
