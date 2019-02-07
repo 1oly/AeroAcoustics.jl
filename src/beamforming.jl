@@ -19,11 +19,17 @@ function beamforming(csm::AbstractArray{Complex{T},N},v::AbstractArray{Complex{T
     return b
 end
 
+"""
+    beamforming(Environment)
+
+Calculate frequency-domain beamforming using cross-spectral matrix `csm` and steering vector `v`
+stored in Environment struct
+"""
 function beamforming(E::Environment)
     @unpack CSM,steeringvec,N,Nf,fn,Cinds = E
     b = Array{Float64, 2}(undef, N, Nf)
     for j in 1:Nf
-        csmd = selectdim(CSM.arr[:,:,Cinds], 3, j)
+        csmd = selectdim(CSM.arr[:,:,Cinds], 3, j) # a view
         for i in 1:N
             vd = @view steeringvec.arr[:,i,j]
             b[i,j] = real(vd'*csmd*vd)

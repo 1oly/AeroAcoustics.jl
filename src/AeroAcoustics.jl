@@ -10,12 +10,14 @@ import Base.length,
        Base.Threads
 
 export Environment,
+       FreqArray,
        SPL,
        steeringvectors,
        steeringvectors!,
        csm,
        csm!,
-       beamforming
+       beamforming,
+       psf
 
 
 
@@ -23,6 +25,7 @@ include("types.jl")
 include("steeringvectors.jl")
 include("csm.jl")
 include("beamforming.jl")
+include("psf.jl")
 
 function SPL(p::Array{T}) where T <: Real
     s = similar(p)

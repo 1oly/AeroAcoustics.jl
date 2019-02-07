@@ -13,7 +13,7 @@ import DSP
     # Test csm
     fs = h5readattr("data/test1_csm.h5", "CsmData")["fs"]
     n = h5readattr("data/test1_csm.h5", "CsmData")["n"]
-    csm_test = csm(t;n=n,noverlap=div(n,2),fs=fs,win=DSP.hanning(n))
+    @timeit "compute csm" csm_test = csm(t;n=n,noverlap=div(n,2),fs=fs,win=DSP.hanning(n))
     @test csm_test.arr ≈ csm_ref
 
     # Setup beamforming
@@ -23,7 +23,7 @@ import DSP
     micgeom = h5read("data/test1_csm.h5", "CsmData")["arrayGeom"]
     @test size(micgeom) == (3,84)
 
-    env = Environment(z0=z0,
+    @timeit "compute env" env = Environment(z0=z0,
                       micgeom=micgeom,
                       flim=(100,10000),
                       Nx = 21,
@@ -32,9 +32,11 @@ import DSP
                       ylim=(-0.5,0.5),
                       CSM=csm_test)
 
-    steeringvectors!(env)
-    b = beamforming(env)
-    s,p = findmax(reshape(b[:,10],21,21))
+    @timeit "compute steeringvec" steeringvectors!(env)
+    @timeit "compute beamforming" s,p = findmax(reshape(beamforming(env)[:,10],21,21))
     @test ceil(SPL(s)) == 47
     @test p.I == (10,13)
+    @timeit "compute psf" s,p = findmax(reshape(psf(env)[:,10],21,21))
+    @test ceil(SPL(sqrt(2).*s)) == 94
+    @test p.I == (11,11)
 end
