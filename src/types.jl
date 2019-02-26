@@ -33,6 +33,6 @@ Base.getindex(A::FreqArray{T, N}, I::Vararg{Int, N}) where {T, N} = A.arr[I...]
     ry = range(ylim[1],stop = ylim[2], length = Ny)
     Rxy = hcat([[x, y, z] for x in rx, y in ry, z in z0]...)
     D0 = colwise(Euclidean(), Rxy, [0,0,0]) # Distance from center of array to grid points
-    D = pairwise(Euclidean(), Rxy, micgeom) # Distance from each mic to grid points
+    D = pairwise(Euclidean(), Rxy, micgeom; dims=2) # Distance from each mic to grid points
     steeringvec = nothing
 end

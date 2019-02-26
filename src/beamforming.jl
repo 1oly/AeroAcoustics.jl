@@ -35,5 +35,5 @@ function beamforming(E::Environment)
             b[i,j] = real(vd'*csmd*vd)
         end
     end
-    return b
+    return FreqArray(b,fn)
 end
