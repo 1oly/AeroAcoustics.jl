@@ -36,7 +36,11 @@ import DSP
     @timeit "compute beamforming" s,p = findmax(reshape(beamforming(env)[:,10],21,21))
     @test ceil(SPL(s)) == 47
     @test p.I == (10,13)
-    @timeit "compute psf" s,p = findmax(reshape(psf(env)[:,10],21,21))
+    p_10 = psf(env)[:,10]
+    @timeit "compute psf" s,p = findmax(reshape(p10,21,21))
     @test ceil(SPL(sqrt(2).*s)) == 94
     @test p.I == (11,11)
+    pcol_10 = zeros(env.N)
+    AeroAcoustics.psf_col!(pcol_10,env.steeringvec.arr[:,:,10],floor(Int,E.N/2)+1)
+    @test pcol_10 ≈ p_10
 end

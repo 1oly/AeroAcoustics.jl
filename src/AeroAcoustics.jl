@@ -17,7 +17,8 @@ export Environment,
        csm,
        csm!,
        beamforming,
-       psf
+       psf,
+       damas!
 
 
 
@@ -26,6 +27,7 @@ include("steeringvectors.jl")
 include("csm.jl")
 include("beamforming.jl")
 include("psf.jl")
+include("damas.jl")
 
 function SPL(p::Array{T}) where T <: Real
     s = similar(p)
