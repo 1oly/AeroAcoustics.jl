@@ -6,24 +6,20 @@ steeringvectors. Optionally, supply the index where the psf is centered, default
 """
 function psf(E::Environment,cent::Int64=floor(Int,E.N/2)+1)
     @unpack steeringvec,M,N,Nf,fn = E
-    psf = Array{Float64, 2}(undef, N, Nf)
+    p = Array{Float64, 2}(undef, N, Nf)
     for j in 1:Nf
-        vc = M*view(steeringvec.arr,:,cent,j)
-        for i in 1:N
-            vd = @view steeringvec.arr[:,i,j]
-            psf[i,j] = abs2(vd'*vc)
-        end
+        vc = view(steeringvec.arr,:,:,j)
+        p[:,j] .= AeroAcoustics.psf_col!(p[:,j],vc,cent)
     end
-    return FreqArray(0.5*psf,fn)
+    return FreqArray(p,fn)
 end
 
 """
     psf_col!(p,steeringvec,cent)
 
-Calculate single frequency point spread function as a column vector. Used for DAMAS.
+Calculate single frequency point spread function as a column vector.
 """
 function psf_col!(p,steeringvec,cent)
     M = size(steeringvec,1)
-    broadcast!(abs2,p,steeringvec'*steeringvec[:,cent])
-    p .= p*0.5*M^2
+    p .= 0.5.*M^2 .*abs2.(steeringvec'*steeringvec[:,cent])
 end
