@@ -1,10 +1,21 @@
 import Base: getindex, iterate
 
 """
-    damas!(x, env::Environment, b, ω::Real; maxiter=10) -> x
-Performs exactly `maxiter` DAMAS iterations. Successive Over Relaxation (SOR) can be set with relaxation parameter `ω`.
+    damas!(x, env::Environment, b [,f<:AbstractArray, ω::Real]; maxiter=10) -> x
+Performs exactly `maxiter` DAMAS iterations for all frequency bins in `env.fn` or frequencies in `f`. Successive Over Relaxation (SOR) can be set with relaxation parameter `ω`.
 Default is `ω=1` corresponding to no relaxation.
 """
+function damas!(x, env, b, f::T=env.fn, ω::Real=1.0; maxiter::Int=10) where T <: AbstractArray
+    # TODO: Check input sizes and index correct from f.
+    for i = 1:env.Nf
+        xf = x[:,i]
+        iterable = DAMASSORIterable(xf, env.steeringvec.arr[:,:,i], zeros(env.N), zeros(env.N), b[:,i], ω, maxiter)
+        for _ = iterable end
+        x[:,i] = xf
+    end
+    x
+end
+
 function damas!(x, env, b, f::Number, ω::Real=1.0; maxiter::Int=10)
     fin = argmin(abs.(env.fn .- f))
     steer = env.steeringvec.arr[:,:,fin]

@@ -33,14 +33,25 @@ import DSP
                       CSM=csm_test)
 
     @timeit "compute steeringvec" steeringvectors!(env)
-    @timeit "compute beamforming" s,p = findmax(reshape(beamforming(env)[:,10],21,21))
-    @test ceil(SPL(s)) == 47
-    @test p.I == (10,13)
-    @timeit "compute psf" p_10 = psf(env)[:,10]
-    s,p = findmax(reshape(p_10,21,21))
-    @test ceil(SPL(sqrt(2).*s)) == 94
-    @test p.I == (11,11)
+    @timeit "compute beamforming" b = beamforming(env)
+    idx = 10 # Frequency index
+    s1,p1 = findmax(reshape(b[:,idx],21,21))
+    bmax = ceil(SPL(s1))
+    @test bmax == 47
+    @test p1.I == (10,13)
+    @timeit "compute psf" p_10 = psf(env)[:,idx]
+    s2,p2 = findmax(reshape(p_10,21,21))
+    @test ceil(SPL(sqrt(2).*s2)) == 94
+    @test p2.I == (11,11)
     pcol_10 = zeros(env.N)
     @timeit "compute psf_col" AeroAcoustics.psf_col!(pcol_10,env.steeringvec.arr[:,:,10],floor(Int,env.N/2)+1)
     @test pcol_10 ≈ p_10
+    # DAMAS
+    x = zeros(size(b,1))
+    @timeit "DAMAS single freq" damas!(x, env, b, env.fn[idx]; maxiter = 10)
+    id1,id2 = UnitRange.(p1.I.-2,p1.I.+2)
+    rdx = range(1;length=env.Nx)
+    rdy = range(1;length=env.Ny)
+    I = LinearIndices((rdx,rdy))[CartesianIndex.(id1,id2)]
+    @test abs.(bmax-SPL.(sum(x[I]))) <= 1 # Within 1dB of beamforming is OK
 end
