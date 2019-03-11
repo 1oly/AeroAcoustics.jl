@@ -19,7 +19,7 @@ end
 function damas!(x, env, b, f::Number, ω::Real=1.0; maxiter::Int=10)
     fin = argmin(abs.(env.fn .- f))
     steer = env.steeringvec.arr[:,:,fin]
-    println("Computing DAMAS for f = $(env.fn[fin])")
+    #println("Computing DAMAS for f = $(env.fn[fin])")
     iterable = DAMASSORIterable(x, steer, similar(x), similar(x), b[:,fin], ω, maxiter)
     for _ = iterable end
     x
