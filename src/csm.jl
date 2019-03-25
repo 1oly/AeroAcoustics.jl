@@ -30,7 +30,8 @@ function csm(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(
     Sc = conj.(S)
     for m in 1:M
         for j in m:M
-            C[j,m,:] = mean!(Pxy,broadcast!(*,ds,Sc[m],S[j])) #mean!(Pxy,Sc[m].*S[j])
+            ds .= Sc[m].*S[j]
+            C[j,m,:] = mean!(Pxy,ds)
         end
     end
 

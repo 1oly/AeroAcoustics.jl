@@ -18,8 +18,9 @@ git:
 #  - julia: nightly
 
 after_success:
-  - julia --project=test/coverage -e 'using Pkg; Pkg.instantiate()'
-  - julia --project=test/coverage test/coverage/coverage.jl
+  #- julia --project=test/coverage -e 'using Pkg; Pkg.instantiate()'
+  #- julia --project=test/coverage test/coverage/coverage.jl
+  - julia -e 'if VERSION >= v"0.7.0-" using Pkg end; cd(Pkg.dir("AeroAcoustics")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
 
 #jobs:
 #   include:
