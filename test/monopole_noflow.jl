@@ -53,8 +53,8 @@ import DSP
     x = zeros(size(b,1))
     @timeit "DAMAS single freq" damas!(x, env, b, env.fn[idx]; maxiter = 10)
     id1,id2 = UnitRange.(p1.I.-2,p1.I.+2)
-    rdx = range(1;length=env.Nx)
-    rdy = range(1;length=env.Ny)
-    I = LinearIndices((rdx,rdy))[CartesianIndex.(id1,id2)]
+    I = LinearIndices((env.Nx,env.Ny))[CartesianIndex.(id1,id2)]
     @test abs.(bmax-SPL.(sum(x[I]))) <= 4 # Within 4dB of beamforming is OK (increase number of iterations to get better estimate)
+    limits = [env.rx[id1][1],env.rx[id1][end],env.ry[id2][1],env.ry[id2][end]]
+    @test SPL.(sourceintegration(x,env,limits)) ≈ SPL.(sum(x[I]))
 end
