@@ -22,6 +22,7 @@ export Environment,
        damas!,
        sourceintegration,
        octavebandlimits,
+       octavebands,
        narrow2oct
 
 
@@ -68,27 +69,43 @@ function octavebands_nomial(n)
     end
 end
 
-function octavebands(n,flim=extrema(octavebands_nomial(n)))
-    fc = octavebands_nomial(n)
-    f_inds = selectfreqs(fc,flim)
-    return fc[f_inds]
+"""
+    octavebands(n,flim=(25.,20000.),nomial::Bool=false)
+
+Compute 1/n octave band center frequencies.
+"""
+function octavebands(n,flim=(25.,20000.),nomial::Bool=false)
+    if nomial && (n==1 || n==3)
+        fc = octavebands_nomial(n)
+        f_inds = selectfreqs(fc,flim)
+        return fc[f_inds]
+    else
+        fc3 = octavebands_nomial(3)
+        smin,imin = findmin(abs.(fc3.-flim[1]))
+        smax,imax = findmin(abs.(fc3.-flim[2]))
+        (smin != 0) ? @warn("low frequency limit is not supported and has been replaced by $(fc3[imin])") : nothing
+        (smax != 0) ? @warn("high frequency limit is not supported and has been replaced by $(fc3[imax])") : nothing
+        flim = (fc3[imin],fc3[imax])
+        G = 10^(3. /10.)
+        fc = exp.(log(flim[1]):(log(G)/n):log(flim[2]))
+        return fc
+    end
 end
 
 """
-    narrow2oct(x::FreqArray,fc,n)
+    narrow2oct(x::FreqArray,n,nomial::Bool=true)
 
-Sum narrow band spectrum to 1/n octave bands given narrow band frequencies `f` in x
-and octave band center frequencies `fc`.
+Sum narrow band spectrum to 1/n octave bands given narrow band frequencies `f` in x.
 """
-function narrow2oct(x::FreqArray,n)
-    fc = octavebands(n,extrema(x.fc))
-    fl, fu = octavebandlimits(fc[f_inds],n)
-    out = similar(fc[f_inds])
-    for i in 1:length(out)
+function narrow2oct(x::FreqArray,n,nomial::Bool=true)
+    fc = octavebands(n,extrema(x.fc),nomial)
+    fl, fu = octavebandlimits(fc,n)
+    out = Array{Float64,2}(undef,size(x,1),length(fc))
+    for i in 1:length(fc)
         inds = selectfreqs(x.fc,(fl[i],fu[i]))
-        out[i] = sum(x[:,inds])/(fu[i]-fl[i])
+        out[:,i] = sum(x[:,inds],dims=2)/(fu[i]-fl[i])
     end
-    return FreqArray(out,fc[f_inds])
+    return FreqArray(out,fc)
 end
 
 end

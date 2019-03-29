@@ -33,7 +33,7 @@ Pre-compute steeringvectors for beamforming using an `Environment` with the nee
 function steeringvectors(E::Environment)
     @unpack fn,c,M,N,Nf,D,D0 = E
     kw = 2pi*fn/c
-    vi = Array{Complex{Float64}}(undef,N,M,Nf)
+    vi = Array{ComplexF64,3}(undef,N,M,Nf)
     for j in 1:Nf
         vi[:,:,j] .= 1 ./(D.*D0.*sum(1 ./D.^2,dims=2)).*exp.(-im.*kw[j].*(D.-D0))
     end
@@ -42,7 +42,7 @@ end
 
 function steeringvectors!(E::Environment)
     @unpack fn,c,M,N,Nf,D,D0,Ma,h = E
-    vi = Array{Complex{Float64}}(undef,N,M,Nf)
+    vi = Array{ComplexF64,3}(undef,N,M,Nf)
 
     if Ma != 0.0
         w = 2pi*fn
