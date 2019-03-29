@@ -1,6 +1,6 @@
 module AeroAcoustics
 using Distances
-using LinearAlgebra # LinAlg in julia 1.0
+using LinearAlgebra
 using Statistics
 using NLsolve
 using Parameters
@@ -34,18 +34,13 @@ include("psf.jl")
 include("damas.jl")
 include("sourceintegration.jl")
 
-function SPL(p::Array{T}) where T <: Real
-    s = similar(p)
-    s[p.>0] = 10*log10.(p[p.>0]/4e-10)
-    s[p.<=0] = -350
-    return s
-end
-SPL(p::Number) = p > 0.0 ? 10*log10(p/4e-10) : -350.0
+SPL(p::Missing) = missing
+SPL(p::Number) = p > 0.0 ? 10*log10(p/4e-10) : missing
 
 """
     octavebandlimits(fc,n)
 
-Compute `1/n` octave band limits given center frequencies fc.
+Compute 1/n octave band limits given center frequencies fc.
 """
 function octavebandlimits(fc,n)
     fl,fu = similar(fc)
@@ -100,10 +95,15 @@ Sum narrow band spectrum to 1/n octave bands given narrow band frequencies `f` i
 function narrow2oct(x::FreqArray,n,nomial::Bool=true)
     fc = octavebands(n,extrema(x.fc),nomial)
     fl, fu = octavebandlimits(fc,n)
-    out = Array{Float64,2}(undef,size(x,1),length(fc))
+    out = Array{Union{Missing, Float64},2}(undef,size(x,1),length(fc))
     for i in 1:length(fc)
         inds = selectfreqs(x.fc,(fl[i],fu[i]))
-        out[:,i] = sum(x[:,inds],dims=2)/(fu[i]-fl[i])
+        if any(inds .== true)
+            out[:,i] = sum(x[:,inds],dims=2)/(fu[i]-fl[i])
+        else
+            @warn "No data in frequency band $(fc[i]) replacing with missing"
+            out[:,i] = Array{Missing,1}(undef,size(x,1))
+        end
     end
     return FreqArray(out,fc)
 end

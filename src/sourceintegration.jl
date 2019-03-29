@@ -36,13 +36,13 @@ function sourceintegration(x::FreqArray,env::Environment,limits::Vector{Vector{T
         end
         out[i,:] = tmp
     end
-    return out
+    return FreqArray(out,x.fc)
 end
 
 function sourceintegration(x::FreqArray,env::Environment,limits::Vector{T}) where T
-    out = Array{Float64}(undef,length(x.fc))
+    out = Array{Union{Missing, Float64}}(undef,length(x.fc))
     for i in 1:length(x.fc)
         out[i] = sourceintegration(x.arr[:,i],env,limits)
     end
-    return out
+    return FreqArray(out,x.fc)
 end
