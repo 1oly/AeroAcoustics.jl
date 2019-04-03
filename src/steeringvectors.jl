@@ -44,7 +44,7 @@ function steeringvectors!(E::Environment)
     @unpack fn,c,M,N,Nf,D,D0,Ma,h = E
     vi = Array{ComplexF64,3}(undef,N,M,Nf)
 
-    if Ma != 0.0
+    if E.shear
         w = 2pi*fn
         ta = AeroAcoustics.propagation_time(E)
         for j in 1:Nf
