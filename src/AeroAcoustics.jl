@@ -34,8 +34,8 @@ include("psf.jl")
 include("damas.jl")
 include("sourceintegration.jl")
 
-SPL(p::Missing) = missing
-SPL(p::Number) = p > 0.0 ? 10*log10(p/4e-10) : missing
+SPL(p::Missing) = NaN
+SPL(p::Number) = p > 0.0 ? 10*log10(p/4e-10) : NaN
 
 """
     octavebandlimits(fc,n)
