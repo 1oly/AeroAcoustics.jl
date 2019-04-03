@@ -27,9 +27,9 @@ stored in Environment struct
 """
 function beamforming(E::Environment)
     @unpack CSM,steeringvec,M,N,Nf,fn,Cinds = E
-    b = Array{Float64, 2}(undef, N, Nf)
-    csmd = Array{ComplexF32,2}(undef,M,M)
-    vd = Array{ComplexF64,1}(undef,M)
+    b = Array{Float64}(undef, N, Nf)
+    csmd = Array{ComplexF32}(undef,M,M)
+    vd = Array{ComplexF64}(undef,M)
     for j in 1:Nf
         csmd .= selectdim(CSM.arr[:,:,Cinds], 3, j) # a view
         for i in 1:N
