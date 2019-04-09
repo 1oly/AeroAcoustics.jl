@@ -5,6 +5,15 @@ import Base: getindex, iterate
 Performs exactly `maxiter` DAMAS iterations for all frequency bins in `env.fn` or frequencies in `f`. Successive Over Relaxation (SOR) can be set with relaxation parameter `ω`.
 Default is `ω=1` corresponding to no relaxation.
 """
+function damas!(x, env::Environment, b::FA, f::T=env.fn, ω::Real=1.0; maxiter::Int=10) where {T <: AbstractArray, FA <: FreqArray}
+    # TODO: Check input sizes and index correct from f.
+    for i = 1:env.Nf
+        @views damas!(x[:,i], env.steeringvec.arr[:,:,i], b[:,i], ω; maxiter=maxiter)
+    end
+    return x
+end
+
+#=
 function damas!(x, env, b, f::T=env.fn, ω::Real=1.0; maxiter::Int=10) where T <: AbstractArray
     # TODO: Check input sizes and index correct from f.
     for i = 1:env.Nf
@@ -21,6 +30,13 @@ function damas!(x, env, b, f::Number, ω::Real=1.0; maxiter::Int=10)
     steer = env.steeringvec.arr[:,:,fin]
     #println("Computing DAMAS for f = $(env.fn[fin])")
     iterable = DAMASSORIterable(x, steer, similar(x), similar(x), b[:,fin], ω, maxiter)
+    for _ = iterable end
+    x
+end
+=#
+
+function damas!(x, steer, b, ω::Real=1.0; maxiter::Int=10)
+    iterable = DAMASSORIterable(x, steer, similar(x), similar(x), b, ω, maxiter)
     for _ = iterable end
     x
 end
