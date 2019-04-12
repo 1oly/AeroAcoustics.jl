@@ -1,6 +1,8 @@
 # AeroAcoustics
 
-[![][pipeline-img]][pipeline-url] [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] [![][coverage-img]][pipeline-url]
+[![][pipeline-img]][pipeline-url] [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] [![][coverage-img]][pipeline-url] [![][docs-img]][docs-url]
+
+https://ollyl.pages.windenergy.dtu.dk/AeroAcoustics.jl/
 
 A [julia](http://julialang.org) package for Aeroacoustics.
 
@@ -36,3 +38,6 @@ Contributions are welcome, the roadmap and todos are tracked in the [roadmap met
 
 [appveyor-img]: https://ci.appveyor.com/api/projects/status/l5igmy3p3q5f4n6d/branch/master?svg=true
 [appveyor-url]: https://ci.appveyor.com/project/1oly/aeroacoustics-jl/branch/master
+
+[docs-img]: https://img.shields.io/badge/docs-latest-blue.svg
+[docs-url]: https://ollyl.pages.windenergy.dtu.dk/AeroAcoustics.jl/
