@@ -2,8 +2,6 @@
 
 [![][pipeline-img]][pipeline-url] [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] [![][coverage-img]][pipeline-url] [![][docs-img]][docs-url]
 
-https://ollyl.pages.windenergy.dtu.dk/AeroAcoustics.jl/
-
 A [julia](http://julialang.org) package for Aeroacoustics.
 
 ## Overview
