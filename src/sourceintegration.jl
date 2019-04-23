@@ -15,14 +15,14 @@ srcint = sourceintegration(x,env,limits)
 function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{T2}) where {T1,T2}
     xi = findall((env.rx.>=limits[1]) .& (env.rx.<=limits[2]))
     yi = findall((env.ry.>=limits[3]) .& (env.ry.<=limits[4]))
-    I = LinearIndices((env.Nx,env.Ny))[CartesianIndex.(xi,yi)]
+    I = LinearIndices((env.Nx,env.Ny))[yi,xi] # Reverse due to matrix indexing (row,col) -> (y,x)
     return sum(x[I])
 end
 
 function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{Vector{T2}}) where {T1,T2}
     out = Float64[]
     for src in limits
-        push!(out,sourceintegration(x,env,src))
+        push!(out,sourceintegration(x,env,src[1]))
     end
     return out
 end
@@ -32,7 +32,7 @@ function sourceintegration(x::FreqArray,env::Environment,limits::Vector{Vector{T
     for i in 1:length(x.fc)
         tmp = Float64[]
         for src in limits
-            push!(tmp,sourceintegration(x.arr[:,i],env,src))
+            push!(tmp,sourceintegration(x.arr[:,i],env,src[1]))
         end
         out[:,i] = tmp
     end
@@ -59,14 +59,17 @@ limits = point_to_region(sources,dxdy)
 srcint = sourceintegration(x,env,limits)
 ```
 """
-function point_to_region(src,dxdy)
+function point_to_region(src::NTuple{2},dxdy)
+    xmin = src[1]-dxdy[1]/2
+    xmax = src[1]+dxdy[1]/2
+    ymin = src[2]-dxdy[2]/2
+    ymax = src[2]+dxdy[2]/2
+    return [xmin,xmax,ymin,ymax]
+end
+function point_to_region(src::T,dxdy) where T <: AbstractArray
     out = Array{Array{Float64,1},1}(undef,0)
     for i = 1:length(src)
-        xmin = src[i][1]-dxdy[1]/2
-        xmax = src[i][1]+dxdy[1]/2
-        ymin = src[i][2]-dxdy[2]/2
-        ymax = src[i][2]+dxdy[2]/2
-        push!(out,[xmin,xmax,ymin,ymax])
+        push!(out,point_to_region(src[i],dxdy))
     end
     return out
 end

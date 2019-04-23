@@ -8,7 +8,8 @@ import DSP
 
 import Base.length,
        Base.push!,
-       Base.Threads
+       Base.Threads,
+       Base.reshape
 
 export Environment,
        FreqArray,
@@ -34,6 +35,9 @@ include("psf.jl")
 include("damas.jl")
 include("sourceintegration.jl")
 
+
+reshape(x::FreqArray,dims::Vararg{Int64,N}) where N = FreqArray(reshape(x.arr,dims...),x.fc)
+
 SPL(p::Missing) = NaN
 SPL(p::Number) = p > 0.0 ? 10*log10(p/4e-10) : NaN
 
@@ -43,7 +47,7 @@ SPL(p::Number) = p > 0.0 ? 10*log10(p/4e-10) : NaN
 Compute 1/n octave band limits given center frequencies fc.
 """
 function octavebandlimits(fc,n)
-    fl,fu = similar(fc)
+    fl = fu = similar(fc)
     C = 10^(3. /10.)
     fl = fc*C^(-1/(2*n))
     fu = fc*C^(1/(2*n))
@@ -92,14 +96,18 @@ end
 
 Sum narrow band spectrum to 1/n octave bands given narrow band frequencies `f` in x.
 """
-function narrow2oct(x::FreqArray,n,nomial::Bool=true)
+function narrow2oct(x::FreqArray,n,nomial::Bool=true;psd=false)
     fc = octavebands(n,extrema(x.fc),nomial)
     fl, fu = octavebandlimits(fc,n)
     out = Array{Union{Missing, Float64},2}(undef,size(x,1),length(fc))
     for i in 1:length(fc)
         inds = selectfreqs(x.fc,(fl[i],fu[i]))
         if any(inds .== true)
-            out[:,i] = sum(x[:,inds],dims=2)/(fu[i]-fl[i])
+            if psd
+                out[:,i] = sum(x[:,inds],dims=2)/(fu[i]-fl[i])
+            else
+                out[:,i] = sum(x[:,inds],dims=2)
+            end
         else
             @warn "No data in frequency band $(fc[i]) replacing with missing"
             out[:,i] = Array{Missing,1}(undef,size(x,1))
