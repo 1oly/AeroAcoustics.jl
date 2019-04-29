@@ -92,7 +92,7 @@ function octavebands(n,flim=(25.,20000.),nomial::Bool=false)
 end
 
 """
-    narrow2oct(x::FreqArray,n,nomial::Bool=true)
+    narrow2oct(x::FreqArray,n,nomial::Bool=true;psd=false)
 
 Sum narrow band spectrum to 1/n octave bands given narrow band frequencies `f` in x.
 """
