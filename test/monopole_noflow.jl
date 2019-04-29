@@ -36,11 +36,8 @@ import DSP
     @timeit "compute beamforming" b = beamforming(env)
     idx = 1 # Frequency index
     s1,p1 = findmax(reshape(b[:,idx],env.Nx,env.Ny))
-    bmax = ceil(SPL(s1))
-    @test bmax == 50.0
-    #srccoords = (-0.05,0.075)
-    #c1 = findfirst(x->x==srccoords[1],env.rx)
-    #c2 = findfirst(x->x==srccoords[2],env.ry)
+    bmax = ceil(SPL(sqrt(2).*s1))
+    @test bmax == 52.0
     @test p1.I == (10,13) # (19,24) for n = 41
     @timeit "compute psf" p_1 = psf(env)[:,idx]
     s2,p2 = findmax(reshape(p_1,env.Nx,env.Ny))
@@ -53,8 +50,6 @@ import DSP
     x = zeros(size(b))
     @timeit "compute DAMAS" damas!(x, env, b; maxiter = 10)
     id1,id2 = UnitRange.(p1.I.-2,p1.I.+2)
-    I = LinearIndices((env.Nx,env.Ny))[CartesianIndex.(id1,id2)]
-    @test abs.(bmax-SPL.(sum(x[I,idx]))) <= 1 # Within 1dB of beamforming is OK (increase number of iterations to get better estimate)
     limits = [env.rx[id1][1],env.rx[id1][end],env.ry[id2][1],env.ry[id2][end]]
-    @test SPL.(sourceintegration(x[:,idx],env,limits)) ≈ SPL.(sum(x[I,idx]))
+    @test abs.(bmax-SPL.(sourceintegration(x[:,idx],env,limits))) <= 1 # Within 1dB of beamforming is OK (increase number of iterations to get better estimate)
 end

@@ -15,7 +15,7 @@ srcint = sourceintegration(x,env,limits)
 function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{T2}) where {T1,T2}
     xi = findall((env.rx.>=limits[1]) .& (env.rx.<=limits[2]))
     yi = findall((env.ry.>=limits[3]) .& (env.ry.<=limits[4]))
-    I = LinearIndices((env.Nx,env.Ny))[yi,xi] # Reverse due to matrix indexing (row,col) -> (y,x)
+    I = LinearIndices((env.Nx,env.Ny))[xi,yi] 
     return sum(x[I])
 end
 
