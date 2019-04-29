@@ -1,5 +1,8 @@
 # flat_t is a helper function to reshape a S x M matrix to a vector of vectors
 function flat_t(t::AbstractArray{T,N}) where {T <: AbstractFloat, N}
+    if size(t,1) < size(t,2)
+        t = permutedims(t)
+    end
     ta = Array{Vector{T}}(undef,size(t,2))
     for i in axes(t,2)
         ta[i] = view(t,:,i)
