@@ -15,14 +15,14 @@ srcint = sourceintegration(x,env,limits)
 function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{T2}) where {T1,T2}
     xi = findall((env.rx.>=limits[1]) .& (env.rx.<=limits[2]))
     yi = findall((env.ry.>=limits[3]) .& (env.ry.<=limits[4]))
-    I = LinearIndices((env.Nx,env.Ny))[xi,yi] 
+    I = LinearIndices((env.Nx,env.Ny))[xi,yi]
     return sum(x[I])
 end
 
 function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{Vector{T2}}) where {T1,T2}
     out = Float64[]
     for src in limits
-        push!(out,sourceintegration(x,env,src[1]))
+        push!(out,sourceintegration(x,env,src))
     end
     return out
 end
@@ -32,7 +32,7 @@ function sourceintegration(x::FreqArray,env::Environment,limits::Vector{Vector{T
     for i in 1:length(x.fc)
         tmp = Float64[]
         for src in limits
-            push!(tmp,sourceintegration(x.arr[:,i],env,src[1]))
+            push!(tmp,sourceintegration(x.arr[:,i],env,src))
         end
         out[:,i] = tmp
     end
