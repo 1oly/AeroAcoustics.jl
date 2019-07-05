@@ -26,15 +26,12 @@ function csm(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(
     nout = div((length(t[1]) - n), n - noverlap)+1
     weight = sum(abs2,win)
     fc = [k*div(fs,n) for k in range(0,stop=noverlap)]
-    Pxy = Array{Complex{T}}(undef,Nf)
     C = Array{Complex{T}}(undef,M,M,Nf)
-    ds = Array{Complex{T}}(undef,Nf,nout)
     S = DSP.stft.(t, n, noverlap; fs=fs, window=win, onesided=true)
     Sc = conj.(S)
     for m in 1:M
         for j in m:M
-            ds .= Sc[m].*S[j]
-            C[j,m,:] = mean!(Pxy,ds)
+            C[j,m,:] .= dropdims(mean(LazyArray(@~ Sc[m].*S[j]),dims=2);dims=2)
         end
     end
 
