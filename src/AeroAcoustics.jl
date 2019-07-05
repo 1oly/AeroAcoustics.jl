@@ -4,6 +4,7 @@ using LinearAlgebra
 using Statistics
 using NLsolve
 using Parameters
+using LazyArrays
 import DSP
 
 import Base.length,
