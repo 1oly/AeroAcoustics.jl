@@ -67,6 +67,7 @@ function point_to_region(src::NTuple{2},dxdy)
     return [xmin,xmax,ymin,ymax]
 end
 function point_to_region(src::T,dxdy) where T <: AbstractArray
+    eltype(src) <: NTuple || (src = Tuple.(src)) # Convertion to array of tuples
     out = Array{Array{Float64,1},1}(undef,0)
     for i = 1:length(src)
         push!(out,point_to_region(src[i],dxdy))
