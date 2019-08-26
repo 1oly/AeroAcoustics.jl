@@ -47,8 +47,15 @@ SPL(p::Number) = p > 0.0 ? 10*log10(p/4e-10) : NaN
 
 Compute 1/n octave band limits given center frequencies fc.
 """
-function octavebandlimits(fc,n)
+function octavebandlimits(fc::Vector{T},n) where T <: Real
     fl = fu = similar(fc)
+    C = 10^(3. /10.)
+    fl = fc*C^(-1/(2*n))
+    fu = fc*C^(1/(2*n))
+    return fl, fu
+end
+
+function octavebandlimits(fc::T,n) where T <: Real
     C = 10^(3. /10.)
     fl = fc*C^(-1/(2*n))
     fu = fc*C^(1/(2*n))
