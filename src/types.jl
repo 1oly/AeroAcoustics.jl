@@ -1,5 +1,6 @@
 abstract type AeroAcousticType end
 
+# TODO: Check that length of arr and fc match!
 struct FreqArray{T, N, AA<:AbstractVector} <: AbstractArray{T, N}
     arr::Array{T, N}
     fc::AA
