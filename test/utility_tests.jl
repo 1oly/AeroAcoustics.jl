@@ -13,7 +13,6 @@ oct1 = [(11,22),
     (5680,11360),
     (11360,22720)]
 
-
 @testset "SPL:" begin
     @test isnan(SPL(-1.0))
     @test isnan(SPL(NaN))
@@ -24,6 +23,7 @@ end
 
 @testset "octavebands:" begin
     # Test 1/1 octavebands (using oct1 table above)
+    @test all(isapprox.(oct1[7],octavebandlimits(1000,1);rtol=0.05))
     fc = AeroAcoustics.octavebands_nomial(1)
     d = octavebandlimits(fc,1)
     dt = collect(zip(d...))
@@ -47,4 +47,28 @@ end
     @test AeroAcoustics.point_to_region(pt,(1.0,)) == [-0.5,0.5,-0.5,0.5]
     @test AeroAcoustics.point_to_region(pt,1.0) == [-0.5,0.5,-0.5,0.5]
     @test AeroAcoustics.point_to_region(pt,1) == [-0.5,0.5,-0.5,0.5]
+
+    a = -[1.25,0.75,1.25,0.75]
+    b = [0.75,1.25,0.75,1.25]
+
+    s = [[-1.0,-1.0],[1.0,1.0]]
+    dxdy = (0.5,0.5)
+    @test AeroAcoustics.point_to_region(s,dxdy) == [a,b]
+
+    s = [(-1.0,-1.0),(1.0,1.0)]
+    dxdy = 0.5
+    @test AeroAcoustics.point_to_region(s,dxdy) == [a,b]
+
+    # TODO: This fails due to point_to_region(s::NTuple{2},...)
+    #s = ((-1.0,-1.0),(1.0,1.0))
+    #dxdy = 0.5
+    #@which AeroAcoustics.point_to_region(s,dxdy) == [a,b]
+
+    s = [(-1.0,-1.0),(1.0,1.0)]
+    dxdy = (0.5,)
+    @test AeroAcoustics.point_to_region(s,dxdy) == [a,b]
+
+    s = [(-1.0,-1.0),(1.0,1.0)]
+    dxdy = (0.5,0.5)
+    @test AeroAcoustics.point_to_region(s,dxdy) == [a,b]
 end
