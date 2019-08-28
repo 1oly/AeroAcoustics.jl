@@ -1,4 +1,4 @@
-using Test, TimerOutputs
+using Test
 using Dates
 using BinaryProvider
 
@@ -23,9 +23,7 @@ end
 
 @testset "AeroAcoustics" begin
     cd(dirname(@__FILE__)) do
-        reset_timer!()
+        include("utility_tests.jl")
         include("monopole_noflow.jl")
-        print_timer()
-        println()
     end
 end

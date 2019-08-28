@@ -59,12 +59,16 @@ limits = point_to_region(sources,dxdy)
 srcint = sourceintegration(x,env,limits)
 ```
 """
-function point_to_region(src::NTuple{2},dxdy)
+function point_to_region(src::NTuple{2},dxdy::Tuple{Vararg{T,N}}) where {T,N}
+    N == 1 && (dxdy = (dxdy[1],dxdy[1]))
     xmin = src[1]-dxdy[1]/2
     xmax = src[1]+dxdy[1]/2
     ymin = src[2]-dxdy[2]/2
     ymax = src[2]+dxdy[2]/2
     return [xmin,xmax,ymin,ymax]
+end
+function point_to_region(src::NTuple{2},dxdy::T) where T <: Real
+    point_to_region(src::NTuple{2},(dxdy[1],dxdy[1]))
 end
 function point_to_region(src::T,dxdy) where T <: AbstractArray
     eltype(src) <: NTuple || (src = Tuple.(src)) # Convertion to array of tuples
