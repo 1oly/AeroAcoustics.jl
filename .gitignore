@@ -10,6 +10,8 @@
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
+*.mem
+*.info
 *.ji
 *.ipynb_checkpoints
 
@@ -23,3 +25,5 @@ docs/build/
 Manifest.toml
 test/data/
 readpti.jl
+local/
+coverage/
