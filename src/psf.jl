@@ -21,5 +21,5 @@ Calculate single frequency point spread function as a column vector.
 """
 function psf_col!(p,steeringvec,cent)
     M = size(steeringvec,1)
-    p .= 0.5.*M^2 .*abs2.(steeringvec'*steeringvec[:,cent])
+    @views p .= 0.5.*M^2 .*abs2.(steeringvec'*steeringvec[:,cent])
 end

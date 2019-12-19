@@ -9,7 +9,6 @@ import DSP
 
 import Base.length,
        Base.push!,
-       Base.Threads,
        Base.reshape
 
 export Environment,
@@ -21,7 +20,7 @@ export Environment,
        csm!,
        beamforming,
        psf,
-       damas!,
+       damas,
        sourceintegration,
        octavebandlimits,
        octavebands,
@@ -112,9 +111,9 @@ function narrow2oct(x::FreqArray,n;nomial::Bool=true,psd::Bool=false)
         inds = selectfreqs(x.fc,(fl[i],fu[i]))
         if any(inds .== true)
             if psd
-                out[:,i] = sum(x[:,inds],dims=2)/(fu[i]-fl[i])
+                out[:,i] = mean(x[:,inds],dims=2)/(x.fc[2]-x.fc[1])
             else
-                out[:,i] = sum(x[:,inds],dims=2)
+                out[:,i] = mean(x[:,inds],dims=2)
             end
         else
             @warn "No data in frequency band $(fc[i]) replacing with missing"
