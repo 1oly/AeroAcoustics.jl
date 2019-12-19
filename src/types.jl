@@ -33,6 +33,7 @@ setup, constants, and stores the relevant data together. The fields are
 - `Ny::Integer=21`: Number of computational gridpoint in y direction.
 - `xlim::Tuple=(-1.,1.)`: Cartesian x-coordinate limits.
 - `ylim::Tuple=(-1.,1.)`: Cartesian y-coordinate limits.
+- `shear::Bool = false`: Amiet correction
 - `c::Real=343.`: Speed of sound [m/s].
 - `Ma::Real=0.0`: Mach number.
 - `h::Real=0.0`: Distance to shear layer (Amiet correction) should be supplied when `Ma != 0`.
@@ -48,7 +49,7 @@ setup, constants, and stores the relevant data together. The fields are
     ylim::NTuple{2,Real} = (-1.,1.)
     shear::Bool = false
     c::Real = 343.0 # Speed of sound
-    Ma::Real = 0.0 # Flow Mach speed TODO: Generalize to NTuple{3,Real}
+    Ma::Real = 0.0 # Flow Mach speed (in positive x-direction) TODO: Generalize to NTuple{3,Real}
     h::Real = 0.0 # Distance to shear layer (used for Shear layer correction)
     ### Compute extra parameters
     Cinds = (CSM.fc.>=flim[1]) .& (CSM.fc.<=flim[2])
