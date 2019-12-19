@@ -73,7 +73,7 @@ end
 
 Calculate cross-spectral matrix from time series `t` which is `S x M` dimensional,
 where `S` is the number of samples and `M`the number of microphones. This version is slower than
-`csm` but allocates much less, therefore `csm_slow` could be used for long time signals.
+`csm` but allocates much less (in some cases), therefore `csm_slow` could be used for long time signals.
 """
 function csm_slow(t::AbstractArray{T};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n)) where T <: AbstractFloat
     csm_slow(flat_t(t);n=n,noverlap=noverlap,fs=fs,win=win)

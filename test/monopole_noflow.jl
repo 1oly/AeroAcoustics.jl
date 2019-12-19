@@ -47,8 +47,9 @@ import DSP
     AeroAcoustics.psf_col!(pcol_1,env.steeringvec.arr[:,:,idx],floor(Int,env.N/2)+1)
     @test pcol_1 ≈ p_1
     # DAMAS
-    x = zeros(size(b))
-    damas!(x, env, b; maxiter = 10)
+    x = damas(env, b; maxiter = 10)
+    x2 = damas(env, b,[b.fc[idx]]; maxiter = 10)
+    @test x[:,idx] ≈ x2
     id1,id2 = UnitRange.(p1.I.-2,p1.I.+2)
     limits = [env.rx[id1][1],env.rx[id1][end],env.ry[id2][1],env.ry[id2][end]]
     @test abs.(bmax-SPL.(sourceintegration(x[:,idx],env,limits))) <= 1 # Within 1dB of beamforming is OK (increase number of iterations to get better estimate)
