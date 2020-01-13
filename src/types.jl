@@ -33,9 +33,10 @@ setup, constants, and stores the relevant data together. The fields are
 - `Ny::Integer=21`: Number of computational gridpoint in y direction.
 - `xlim::Tuple=(-1.,1.)`: Cartesian x-coordinate limits.
 - `ylim::Tuple=(-1.,1.)`: Cartesian y-coordinate limits.
-- `shear::Bool = false`: Amiet correction
+- `shear::Bool = false`: Amiet phase correction
+- `ampcorr::Bool = shear`: Amiet amplitude correction (only applies when shear = true)
 - `c::Real=343.`: Speed of sound [m/s].
-- `Ma::Real=0.0`: Mach number.
+- `Ma::Real=0.0`: Mach number (sign determines flow direction)
 - `h::Real=0.0`: Distance to shear layer (Amiet correction) should be supplied when `Ma != 0`.
 """
 @with_kw mutable struct Environment <: AeroAcousticType
@@ -48,9 +49,10 @@ setup, constants, and stores the relevant data together. The fields are
     xlim::NTuple{2,Real} = (-1.,1.)
     ylim::NTuple{2,Real} = (-1.,1.)
     shear::Bool = false
+    ampcorr::Bool = shear
     c::Real = 343.0 # Speed of sound
     Ma::Real = 0.0 # Flow Mach speed (in positive x-direction) TODO: Generalize to NTuple{3,Real}
-    h::Real = 0.0 # Distance to shear layer (used for Shear layer correction)
+    h::Real = 0.0 # Distance from source to shear layer (used for Shear layer correction)
     ### Compute extra parameters
     Cinds = (CSM.fc.>=flim[1]) .& (CSM.fc.<=flim[2])
     fn = CSM.fc[Cinds]

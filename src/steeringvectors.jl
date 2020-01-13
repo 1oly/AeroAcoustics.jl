@@ -6,9 +6,15 @@ function shear!(fvec,xi,xm,Ma,h)
     fvec[3] = xi[3] - h
 end
 
-function propagation_time(E::Environment)
-    @unpack N,M,micgeom,Rxy,Ma,h,c = E
+"""
+    shearlayercorrection(E::Environment)
+
+Compute shear layer correction using Amiet's derivation for a zero-thickness shear layer. Returns time-delay and amplitude correction.
+"""
+function shearlayercorrection(E::Environment)
+    @unpack N,M,micgeom,Rxy,Ma,h,c,z0 = E
     ta = Array{Float64,2}(undef,N,M)
+    pcpm2 = Array{Float64,2}(undef,N,M)
     xm = zeros(3,M)
     for n = 1:N
         xm[1:2,:] .= micgeom[1:2,:] .- Rxy[1:2,n]
@@ -18,15 +24,21 @@ function propagation_time(E::Environment)
             r1 = norm(xi)
             d = xi[1]*Ma*c/r1
             c1 = d + sqrt(d^2+c^2-(Ma*c)^2)
-            r2 = norm(xm[:,m]-xi)
+            r2v = xm[:,m]-xi
+            r2 = norm(r2v)
             ta[n,m] = r1/c1 + r2/c
+            theta = acos(dot([r2v[1],0],[sign(Ma),0])/norm(r2v))
+            hH = h/z0
+            zeta = sqrt((1 - abs(Ma)*cos(theta))^2 - cos(theta)^2)
+            pcpm2[n,m]=1/4/zeta^2*hH^2*(1+(1/hH-1)*zeta.^3/sin(theta)^3)*(1+(1/hH-1)*zeta/sin(theta))*(zeta+sin(theta)*(1-abs(Ma)*cos(theta))^2)^2
         end
     end
-    return ta
+
+    return ta,pcpm2
 end
 
 """
-    steeringvectors(E)
+    steeringvectors(E::Environment)
 
 Pre-compute steeringvectors for beamforming using an `Environment` with the needed parameters.
 """
@@ -46,13 +58,20 @@ function steeringvectors!(E::Environment)
 
     if E.shear
         w = 2pi*fn
-        ta = AeroAcoustics.propagation_time(E)
-        Threads.@threads for j in 1:Nf
-            vi[:,:,j] .= (1 ./M).*(ta.*c./D0).*exp.(-im.*w[j].*ta)
+        ta,pcpm2 = AeroAcoustics.shearlayercorrection(E)
+        for j in 1:Nf
+            vi[:,:,j] .= 1 ./(ta.*c.*D0.*sum(1 ./(ta.*c).^2,dims=2)).*exp.(-im.*w[j].*ta)
+            #vi[:,:,j] .= (1 ./M).*(ta.*c./D0).*exp.(-im.*w[j].*ta)
+        end
+        if E.ampcorr
+            for j in 1:Nf
+                vi[:,:,j] .*= sqrt.(pcpm2)
+            end
         end
     else
         kw = 2pi*fn/c
-        Threads.@threads for j in 1:Nf
+        for j in 1:Nf
+            #vi[:,:,j] .= (1 ./M).*(D./D0).*exp.(-im.*kw[j].*(D.-D0))
             vi[:,:,j] .= 1 ./(D.*D0.*sum(1 ./D.^2,dims=2)).*exp.(-im.*kw[j].*(D.-D0))
         end
     end
