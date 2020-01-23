@@ -24,6 +24,7 @@ end
 @testset "AeroAcoustics" begin
     cd(dirname(@__FILE__)) do
         include("utility_tests.jl")
+        include("csm_test.jl")
         include("monopole_noflow.jl")
     end
 end

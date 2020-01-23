@@ -1,5 +1,6 @@
 using Test
 using AeroAcoustics
+using DSP
 
 oct1 = [(11,22),
     (22,44),
@@ -71,4 +72,11 @@ end
     s = [(-1.0,-1.0),(1.0,1.0)]
     dxdy = (0.5,0.5)
     @test AeroAcoustics.point_to_region(s,dxdy) == [a,b]
+end
+
+@testset "ENBW:" begin
+    fs = 2^16
+    n = 1024
+    win = DSP.rect(n)
+    @test enbw(fs,win) == fs/n
 end

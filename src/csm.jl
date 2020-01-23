@@ -36,20 +36,19 @@ function flat_t(t::AbstractArray{T,N}) where {T <: AbstractFloat, N}
 end
 
 """
-    csm(t;n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n))
+    csm(t;n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n),scaling="spectrum")
 
 Calculate cross-spectral matrix from time series `t` which is `S x M` dimensional,
 where `S` is the number of samples and `M`the number of microphones.
 """
-function csm(t::AbstractArray{T};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n)) where T <: AbstractFloat
-    csm(flat_t(t);n=n,noverlap=noverlap,fs=fs,win=win)
+function csm(t::AbstractArray{T};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n),scaling="spectrum") where T <: AbstractFloat
+    csm(flat_t(t);n=n,noverlap=noverlap,fs=fs,win=win,scaling=scaling)
 end
 
-function csm(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n)) where T <: AbstractFloat
+function csm(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n),scaling="spectrum") where T <: AbstractFloat
     M = length(t)
     Nf = div(n,2)+1
     nout = div((length(t[1]) - n), n - noverlap)+1
-    weight = sum(abs2,win)
     fc = [k*div(fs,n) for k in range(0,stop=noverlap)]
     C = Array{Complex{T}}(undef,M,M,Nf)
     S = DSP.stft.(t, n, noverlap; fs=fs, window=win, onesided=true)
@@ -60,7 +59,14 @@ function csm(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(
         end
     end
 
-    C .*= 2/n/weight
+    if scaling == "density"
+        scale = 1/(fs*sum(abs2,win))
+    elseif scaling == "spectrum"
+        scale = 1/(sum(win).^2)
+    end
+
+    C .*= scale
+    C[:,:,2:end-1] .*= 2
 
     for ω in 1:Nf
         C[:,:,ω] = Hermitian(C[:,:,ω],:L)
