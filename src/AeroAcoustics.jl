@@ -24,7 +24,8 @@ export Environment,
        sourceintegration,
        octavebandlimits,
        octavebands,
-       narrow2oct
+       narrow2oct,
+       enbw
 
 
 include("types.jl")
@@ -122,5 +123,12 @@ function narrow2oct(x::FreqArray,n;nomial::Bool=true,psd::Bool=false)
     end
     return FreqArray(out,fc)
 end
+
+"""
+    enbw(fs,win)
+
+Equivalent Noise Band Width. Use to convert power spectrum to power spectral density and reverse. PS = PSD*ENBW
+"""
+enbw(fs,win) = fs*sum(abs2,win)/sum(win)^2
 
 end
