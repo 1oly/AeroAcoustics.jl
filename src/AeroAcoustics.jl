@@ -112,9 +112,9 @@ function narrow2oct(x::FreqArray,n;nomial::Bool=true,psd::Bool=false)
         inds = selectfreqs(x.fc,(fl[i],fu[i]))
         if any(inds .== true)
             if psd
-                out[:,i] = mean(x[:,inds],dims=2)/(x.fc[2]-x.fc[1])
+                out[:,i] = sum(x[:,inds],dims=2)/(x.fc[2]-x.fc[1])
             else
-                out[:,i] = mean(x[:,inds],dims=2)
+                out[:,i] = sum(x[:,inds],dims=2)
             end
         else
             @warn "No data in frequency band $(fc[i]) replacing with missing"
