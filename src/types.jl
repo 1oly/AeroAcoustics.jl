@@ -11,6 +11,7 @@ Base.size(A::FreqArray) = size(A.arr)
 Base.axes(A::FreqArray) = axes(A.arr)
 Base.getindex(A::FreqArray, i::Int) = A.arr[i]
 Base.getindex(A::FreqArray{T, N}, I::Vararg{Int, N}) where {T, N} = A.arr[I...]
+Base.setindex!(A::FreqArray,v,i) = A.arr[i] = v
 
 """
     Environment
