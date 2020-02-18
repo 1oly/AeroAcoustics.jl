@@ -34,6 +34,8 @@ import DSP
 
     steeringvectors!(env)
     b = beamforming(env)
+    bd = beamforming(env.CSM.arr[:,:,env.Cinds],env.steeringvec.arr)
+    @test b.arr == bd
     idx = 1 # Frequency index
     s1,p1 = findmax(reshape(b[:,idx],env.Nx,env.Ny))
     bmax = ceil(SPL(sqrt(2).*s1))
