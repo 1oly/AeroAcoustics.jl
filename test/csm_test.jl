@@ -19,13 +19,15 @@ import DSP
     n = 1024
     Pxx_d = csm(x;n=n,noverlap=div(n,2),win=DSP.hanning(n),fs=fs,scaling="density")
     fc = Pxx_d.fc
-    Pxx_d = real.(Pxx_d[1,1,:])
+    Pxx_d1 = real.(Pxx_d[1,1,:])
     Pxx_w = DSP.welch_pgram(x,n;onesided=true,fs=fs,window=DSP.hanning(n))
-    @test Pxx_d ≈ Pxx_w.power
+    @test Pxx_d1 ≈ Pxx_w.power
+    @test Pxx_d == AeroAcoustics.csm_slow(x;n=n,noverlap=div(n,2),win=DSP.hanning(n),fs=fs,scaling="density")
 
     Pxx_s = csm(x;n=n,noverlap=div(n,2),win=DSP.hanning(n),fs=fs,scaling="spectrum")
     fc = Pxx_s.fc
-    Pxx_s = real.(Pxx_s[1,1,:])
+    Pxx_s1 = real.(Pxx_s[1,1,:])
     ENBW = enbw(fs,DSP.hanning(1024))
-    @test Pxx_s ≈ Pxx_w.power*ENBW
+    @test Pxx_s1 ≈ Pxx_w.power*ENBW
+    @test Pxx_s == AeroAcoustics.csm_slow(x;n=n,noverlap=div(n,2),win=DSP.hanning(n),fs=fs,scaling="spectrum")
 end
