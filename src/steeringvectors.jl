@@ -3,34 +3,40 @@ function shear!(fvec,xi,xm,Ma,h)
     b = norm(xm-xi)
     fvec[1] = (1/a)*xi[1]-(1/b)*(1-Ma^2)*(xm[1]-xi[1]) - Ma
     fvec[2] = (1/a)*xi[2]-(1/b)*(xm[2]-xi[2])
-    fvec[3] = xi[3] - h
+    fvec[3] = h - xi[3]
 end
 
 """
     shearlayercorrection(E::Environment)
 
-Compute shear layer correction using Amiet's derivation for a zero-thickness shear layer. Returns time-delay and amplitude correction.
+Compute shear layer correction using Amiet's derivation for a zero-thickness shear layer. Returns time-delay and amplitude correction. Relies on `shear=true`, `Ma` and `h` set in `Environment()`. The coordinate system is assumed to be at the microphone array center and `h` is the distance from the array center to the shear layer (this is contrary to the references).
+
+References:
+-	R. K. Amiet, “Refraction of sound by a shear layer,” Journal of Sound and Vibration, vol. 58, no. 4, pp. 467–482, 1978.
+-	C. Bahr, et. al “Shear Layer Correction Validation Using A Non-Intrusive Acoustic Point Source,” presented at the 16th AIAA/CEAS Aeroacoustics Conference, Reston, Virigina, 2012.
 """
 function shearlayercorrection(E::Environment)
-    @unpack N,M,micgeom,Rxy,Ma,h,c,z0 = E
+    @unpack N,M,micgeom,Rxy,Ma,h,c,z0,ampcorr = E
     ta = Array{Float64,2}(undef,N,M)
     pcpm2 = Array{Float64,2}(undef,N,M)
-    xm = zeros(3,M)
+    xn = zeros(3,M)
     for n = 1:N
-        xm[1:2,:] .= micgeom[1:2,:] .- Rxy[1:2,n]
+        xn .= Rxy[:,n] .- micgeom
         for m = 1:M
-            res = nlsolve((fvec,x)->shear!(fvec,x,xm[:,m],Ma,h),[.1,.1,h])
+            res = nlsolve((fvec,x)->shear!(fvec,x,xn[:,m],-Ma,h),[.1,.1,h])
             xi = res.zero
             r1 = norm(xi)
-            d = xi[1]*Ma*c/r1
+            d = -xi[1]*Ma*c/r1
             c1 = d + sqrt(d^2+c^2-(Ma*c)^2)
-            r2v = xm[:,m]-xi
+            r2v = xn[:,m]-xi
             r2 = norm(r2v)
-            ta[n,m] = r1/c1 + r2/c
-            theta = acos(dot([r2v[1],0],[sign(Ma),0])/norm(r2v))
-            hH = h/z0
-            zeta = sqrt((1 - abs(Ma)*cos(theta))^2 - cos(theta)^2)
-            pcpm2[n,m]=1/4/zeta^2*hH^2*(1+(1/hH-1)*zeta.^3/sin(theta)^3)*(1+(1/hH-1)*zeta/sin(theta))*(zeta+sin(theta)*(1-abs(Ma)*cos(theta))^2)^2
+            ta[n,m] = r1/c + r2/c1
+            if ampcorr
+                theta = acos(-sign(Ma)*xi[1])
+                hH = (z0-h)/z0
+                zeta = sqrt((1 - abs(Ma)*cos(theta))^2 - cos(theta)^2)
+                pcpm2[n,m]=1/4/zeta^2*hH^2*(1+(1/hH-1)*zeta.^3/sin(theta)^3)*(1+(1/hH-1)*zeta/sin(theta))*(zeta+sin(theta)*(1-abs(Ma)*cos(theta))^2)^2
+            end
         end
     end
 

@@ -17,7 +17,7 @@ Base.setindex!(A::FreqArray,v,i) = A.arr[i] = v
     Environment
 
 The Environment struct is required for most methods and defines the geometrical
-setup, constants, and stores the relevant data together. The fields are
+setup, constants, and stores the relevant data together. The microphone array is assumed to be at the center of the coordinate system. The fields are
 
 # Arguments
 
@@ -38,7 +38,7 @@ setup, constants, and stores the relevant data together. The fields are
 - `ampcorr::Bool = shear`: Amiet amplitude correction (only applies when shear = true)
 - `c::Real=343.`: Speed of sound [m/s].
 - `Ma::Real=0.0`: Mach number (sign determines flow direction)
-- `h::Real=0.0`: Distance to shear layer (Amiet correction) should be supplied when `Ma != 0`.
+- `h::Real=0.0`: Distance from array center to shear layer (Amiet correction) should be supplied when `Ma != 0`.
 """
 @with_kw mutable struct Environment <: AeroAcousticType
     micgeom::Matrix{<:AbstractFloat}
@@ -53,7 +53,7 @@ setup, constants, and stores the relevant data together. The fields are
     ampcorr::Bool = shear
     c::Real = 343.0 # Speed of sound
     Ma::Real = 0.0 # Flow Mach speed (in positive x-direction) TODO: Generalize to NTuple{3,Real}
-    h::Real = 0.0 # Distance from source to shear layer (used for Shear layer correction)
+    h::Real = 0.0 # Distance from array center to shear layer
     ### Compute extra parameters
     Cinds = (CSM.fc.>=flim[1]) .& (CSM.fc.<=flim[2])
     fn = CSM.fc[Cinds]
