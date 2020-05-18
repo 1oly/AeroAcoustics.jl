@@ -11,38 +11,42 @@ src2 = [-0.2,0.0,-0.1,0.1]
 limits = [src1,src2]
 srcint = sourceintegration(x,env,limits)
 ```
+
+Optionally supply keyword `int_thres` to set a threshold on source integration. Default is set to `Inf` which sum all values within integration region.
 """
-function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{T2}) where {T1,T2}
+function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{T2};int_thres=Inf) where {T1,T2}
     xi = findall((env.rx.>=limits[1]) .& (env.rx.<=limits[2]))
     yi = findall((env.ry.>=limits[3]) .& (env.ry.<=limits[4]))
     I = LinearIndices((env.Nx,env.Ny))[xi,yi]
-    return sum(x[I])
+    fmax,g_idx = findmax(x[I])
+    thres_idx = SPL.(abs.(x[I] .- fmax)) .<= int_thres
+    return sum(x[I][thres_idx])+x[I][g_idx]
 end
 
-function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{Vector{T2}}) where {T1,T2}
+function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{Vector{T2}};int_thres=Inf) where {T1,T2}
     out = Float64[]
     for src in limits
-        push!(out,sourceintegration(x,env,src))
+        push!(out,sourceintegration(x,env,src;int_thres=int_thres))
     end
     return out
 end
 
-function sourceintegration(x::FreqArray,env::Environment,limits::Vector{Vector{T}}) where T
+function sourceintegration(x::FreqArray,env::Environment,limits::Vector{Vector{T}};int_thres=Inf) where T
     out = Array{Float64}(undef,length(limits),length(x.fc))
     for i in 1:length(x.fc)
         tmp = Float64[]
         for src in limits
-            push!(tmp,sourceintegration(x.arr[:,i],env,src))
+            push!(tmp,sourceintegration(x.arr[:,i],env,src;int_thres=int_thres))
         end
         out[:,i] = tmp
     end
     return FreqArray(out,x.fc)
 end
 
-function sourceintegration(x::FreqArray,env::Environment,limits::Vector{T}) where T
+function sourceintegration(x::FreqArray,env::Environment,limits::Vector{T};int_thres=Inf) where T
     out = Array{Union{Missing, Float64}}(undef,length(x.fc))
     for i in 1:length(x.fc)
-        out[i] = sourceintegration(x.arr[:,i],env,limits)
+        out[i] = sourceintegration(x.arr[:,i],env,limits;int_thres=int_thres)
     end
     return FreqArray(out,x.fc)
 end
