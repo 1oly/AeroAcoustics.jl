@@ -10,8 +10,6 @@ This package provide methods for working with microphone array measurements.
 Centered around frequency-domain beamforming, methods for source localization and
 quantification have been collected here. The package is under active development.
 
-Here is a small [demonstration](https://nbviewer.jupyter.org/urls/gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/raw/master/examples/Introduction.ipynb) of the current functionality.
-
 Another noteworthy library for microphone array measurements is [Acoular](http://www.acoular.org), written in Python. AeroAcoustics.jl draws inspiration from Acoular but focusses only on the processing of *measurement data*, while Acoular also has functionality for generating simulations.
 
 ## Installation
@@ -23,7 +21,7 @@ pkg> add https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl
 ```
 
 ## Contribution
-Contributions are welcome, the roadmap and todos are tracked in the [roadmap meta-issue](https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/issues/1).
+Contributions are welcome!
 
 
 [pipeline-img]: https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/badges/master/pipeline.svg
