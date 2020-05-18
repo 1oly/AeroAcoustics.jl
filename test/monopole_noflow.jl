@@ -22,10 +22,13 @@ import DSP
     z0 = h5readattr("data/test1_csm.h5", "CsmData")["z0"]
     micgeom = h5read("data/test1_csm.h5", "CsmData")["arrayGeom"]
     @test size(micgeom) == (3,84)
+    weights_vector = ones(84)
+    weights_vector[4:34] .= 0
 
     env = Environment(z0=z0,
                       micgeom=micgeom,
                       flim=(3000,4000),
+                      wv=weights_vector,
                       Nx = 21,
                       Ny = 21,
                       xlim=(-0.5,0.5),
@@ -34,7 +37,7 @@ import DSP
 
     steeringvectors!(env)
     b = beamforming(env)
-    bd = beamforming(env.CSM.arr[:,:,env.Cinds],env.steeringvec.arr)
+    bd = beamforming(env.CSM_s.arr,env.steeringvec.arr)
     @test b.arr == bd
     idx = 1 # Frequency index
     s1,p1 = findmax(reshape(b[:,idx],env.Nx,env.Ny))

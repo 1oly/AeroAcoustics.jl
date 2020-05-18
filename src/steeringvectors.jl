@@ -16,12 +16,12 @@ References:
 -	C. Bahr, et. al “Shear Layer Correction Validation Using A Non-Intrusive Acoustic Point Source,” presented at the 16th AIAA/CEAS Aeroacoustics Conference, Reston, Virigina, 2012.
 """
 function shearlayercorrection(E::Environment)
-    @unpack N,M,micgeom,Rxy,Ma,h,c,z0,ampcorr = E
+    @unpack N,M,micgeom_s,Rxy,Ma,h,c,z0,ampcorr = E
     ta = Array{Float64,2}(undef,N,M)
     pcpm2 = Array{Float64,2}(undef,N,M)
     xn = zeros(3,M)
     for n = 1:N
-        xn .= Rxy[:,n] .- micgeom
+        xn .= Rxy[:,n] .- micgeom_s
         for m = 1:M
             res = nlsolve((fvec,x)->shear!(fvec,x,xn[:,m],-Ma,h),[.1,.1,h])
             xi = res.zero

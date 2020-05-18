@@ -6,8 +6,8 @@ Calculate frequency-domain beamforming using cross-spectral matrix `csm` and st
 First dimension of `v` and `csm` must be equal.
 """
 function beamforming(csm::A,v::B) where {T1<:AbstractFloat,T2<:AbstractFloat, N,  A<:AbstractArray{Complex{T1},N},B<:AbstractArray{Complex{T2},N}}
-    @assert size(csm,1) == size(csm,2) "csm must be square with dimensions M x M (x Nf)!"
-    @assert size(v,1) == size(csm,1) "First dimension of v and csm must be equal!"
+    #@assert size(csm,1) == size(csm,2) "csm must be square with dimensions M x M (x Nf)!"
+    #@assert size(v,1) == size(csm,1) "First dimension of v and csm must be equal!"
     b = Array{T2, 2}(undef, size(v,2), size(csm,3))
     for j in axes(csm,3)
         csmd = @view csm[:,:,j]
@@ -26,10 +26,10 @@ Calculate frequency-domain beamforming using cross-spectral matrix `csm` and st
 stored in Environment struct
 """
 function beamforming(E::Environment)
-    @unpack CSM,steeringvec,M,N,Nf,fn,Cinds = E
+    @unpack CSM_s,steeringvec,M,N,Nf,fn = E
     b = Array{Float64}(undef, N, Nf)
     @views @inbounds for j in 1:Nf
-        AeroAcoustics.bf_col!(b[:,j],steeringvec.arr[:,:,j],selectdim(CSM.arr[:,:,Cinds], 3, j))
+        AeroAcoustics.bf_col!(b[:,j],steeringvec.arr[:,:,j],selectdim(CSM_s.arr, 3, j))
     end
     return FreqArray(b,fn)
 end

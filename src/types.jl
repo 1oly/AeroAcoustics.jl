@@ -34,6 +34,7 @@ setup, constants, and stores the relevant data together. The microphone array is
 - `Ny::Integer=21`: Number of computational gridpoint in y direction.
 - `xlim::Tuple=(-1.,1.)`: Cartesian x-coordinate limits.
 - `ylim::Tuple=(-1.,1.)`: Cartesian y-coordinate limits.
+- `wv`=ones(size(micgeom,2)): Weights vector for beamforming-shading.
 - `shear::Bool = false`: Amiet phase correction
 - `ampcorr::Bool = shear`: Amiet amplitude correction (only applies when shear = true)
 - `c::Real=343.`: Speed of sound [m/s].
@@ -57,13 +58,17 @@ setup, constants, and stores the relevant data together. The microphone array is
     ### Compute extra parameters
     Cinds = (CSM.fc.>=flim[1]) .& (CSM.fc.<=flim[2])
     fn = CSM.fc[Cinds]
-    M::Int = size(micgeom,2)
+    wv::Vector = ones(size(micgeom,2)) # weights vector
+    micgeom_s = micgeom[:,Bool.(wv)]
+    CSM_s = FreqArray(CSM[Bool.(wv),Bool.(wv),Cinds],fn)
+    M::Int = size(micgeom_s,2) #count((!iszero).(wv))
     Nf::Int = length(fn)
     N = Nx*Ny
     rx = range(xlim[1],stop = xlim[2], length = Nx)
     ry = range(ylim[1],stop = ylim[2], length = Ny)
     Rxy = hcat([[x, y, z] for x in rx, y in ry, z in z0]...)
     D0 = colwise(Euclidean(), Rxy, [0,0,0]) # Distance from center of array to grid points
-    D = pairwise(Euclidean(), Rxy, micgeom; dims=2) # Distance from each mic to grid points
+    D = pairwise(Euclidean(), Rxy, micgeom_s; dims=2) # Distance from each mic to grid points
     steeringvec = nothing
 end
+
