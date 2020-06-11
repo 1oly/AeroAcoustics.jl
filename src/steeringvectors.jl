@@ -52,7 +52,7 @@ function steeringvectors(E::Environment)
     @unpack fn,c,M,N,Nf,D,D0 = E
     kw = 2pi*fn/c
     vi = Array{ComplexF64,3}(undef,N,M,Nf)
-    Threads.@threads for j in 1:Nf
+    for j in 1:Nf
         vi[:,:,j] .= 1 ./(D.*D0.*sum(1 ./D.^2,dims=2)).*exp.(-im.*kw[j].*(D.-D0))
     end
     steeringvec = FreqArray(permutedims(vi,(2,1,3)),fn)

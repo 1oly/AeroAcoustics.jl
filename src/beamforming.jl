@@ -36,6 +36,16 @@ end
 
 function bf_col!(b::A,st::B,csm::C) where {T1<:AbstractFloat,T2<:AbstractFloat, N, A<:AbstractArray{T1,1}, B<:AbstractArray{Complex{T1},N},C<:AbstractArray{Complex{T2},N}}
     @views @inbounds for i in 1:length(b)
-        b[i] = real(st[:,i]'*csm*st[:,i])
+        b[i] = real(mydot(st[:,i]',csm,st[:,i]))
     end
+end
+
+function mydot(xt, A, x)
+    s = zero(promote_type(eltype(x), eltype(A)))
+    @inbounds @simd for m in 1:size(A,1) 
+        for n in 1:size(A,2)
+            s += xt[m] * A[m,n] * x[n]
+        end
+    end
+    s
 end
