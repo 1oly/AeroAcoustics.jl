@@ -25,7 +25,9 @@ export Environment,
        octavebands,
        narrow2oct,
        enbw,
-       coherence_weights
+       coherence_weights,
+       DR!,
+       DR
 
 
 include("utils.jl")
@@ -63,6 +65,38 @@ function narrow2oct(x::FreqArray,n;nomial::Bool=true,psd::Bool=false)
         end
     end
     return FreqArray(out,fc)
+end
+
+"""
+    DR!(CSM::FreqArray)
+    
+Apply diagonal removal to CSM.
+"""
+function DR!(CSM::FreqArray)
+    T = eltype(CSM)
+    M,M,Nf = size(CSM)
+    for j = 1:Nf
+        for i = 1:M
+            CSM.arr[i,i,j] = zero(T)
+        end
+    end
+end
+
+"""
+    DR(CSM::FreqArray)
+    
+Apply diagonal removal to CSM and new array.
+"""
+function DR(CSM::FreqArray)
+    T = eltype(CSM)
+    M,M,Nf = size(CSM)
+    CSMd = copy(CSM)
+    for j = 1:Nf
+        for i = 1:M
+            CSMd[i,i,j] = zero(T)
+        end
+    end
+    return FreqArray(CSMd,CSM.fc)
 end
 
 end

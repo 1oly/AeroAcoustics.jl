@@ -1,4 +1,4 @@
-image: julia:1.5                # image comes from Docker hub
+image: julia:1.3                # image comes from Docker hub
 
 before_script:
   - apt-get -qq update; apt-get -y install git hdf5-tools
