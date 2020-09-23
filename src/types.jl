@@ -34,12 +34,15 @@ setup, constants, and stores the relevant data together. The microphone array is
 - `Ny::Integer=21`: Number of computational gridpoint in y direction.
 - `xlim::Tuple=(-1.,1.)`: Cartesian x-coordinate limits.
 - `ylim::Tuple=(-1.,1.)`: Cartesian y-coordinate limits.
-- `wv`=ones(size(micgeom,2)): Weights vector for beamforming-shading.
+- `wv=ones(size(micgeom,2))`: Microphones on/off. 
+- `wc::Bool`: Microphones coherence weighting.
+- `w=ones(M,Nf)`: Microphone weights. If `wc=true` it calculates coherence weighting.
 - `shear::Bool = false`: Amiet phase correction
 - `ampcorr::Bool = shear`: Amiet amplitude correction (only applies when shear = true)
 - `c::Real=343.`: Speed of sound [m/s].
 - `Ma::Real=0.0`: Mach number (sign determines flow direction)
 - `h::Real=0.0`: Distance from array center to shear layer (Amiet correction) should be supplied when `Ma != 0`.
+
 """
 @with_kw mutable struct Environment <: AeroAcousticType
     micgeom::Matrix{<:AbstractFloat}
@@ -63,6 +66,8 @@ setup, constants, and stores the relevant data together. The microphone array is
     CSM_s = FreqArray(CSM[Bool.(wv),Bool.(wv),Cinds],fn)
     M::Int = size(micgeom_s,2) #count((!iszero).(wv))
     Nf::Int = length(fn)
+    wc::Bool = false
+    w = ifelse(wc,coherence_weights(CSM_s),ones(M,Nf))
     N = Nx*Ny
     rx = range(xlim[1],stop = xlim[2], length = Nx)
     ry = range(ylim[1],stop = ylim[2], length = Ny)
