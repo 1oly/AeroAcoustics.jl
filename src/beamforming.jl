@@ -26,10 +26,12 @@ Calculate frequency-domain beamforming using cross-spectral matrix `csm` and st
 stored in Environment struct
 """
 function beamforming(E::Environment)
-    @unpack CSM_s,steeringvec,M,N,Nf,fn = E
+    @unpack CSM_s,w,steeringvec,M,N,Nf,fn = E
     b = Array{Float64}(undef, N, Nf)
     @views @inbounds for j in 1:Nf
-        AeroAcoustics.bf_col!(b[:,j],steeringvec.arr[:,:,j],selectdim(CSM_s.arr, 3, j))
+        st = E.steeringvec.arr[:,:,j]
+        @. st = complex(w[:,j].*real(st), imag(st))
+        AeroAcoustics.bf_col!(b[:,j],st,selectdim(CSM_s.arr, 3, j))
     end
     return FreqArray(b,fn)
 end
