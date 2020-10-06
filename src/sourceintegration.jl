@@ -18,9 +18,10 @@ function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{T2};int
     xi = findall((env.rx.>=limits[1]) .& (env.rx.<=limits[2]))
     yi = findall((env.ry.>=limits[3]) .& (env.ry.<=limits[4]))
     I = LinearIndices((env.Nx,env.Ny))[xi,yi]
-    fmax,g_idx = findmax(x[I])
-    thres_idx = SPL.(abs.(x[I] .- fmax)) .<= int_thres
-    return sum(x[I][thres_idx])+x[I][g_idx]
+    pos_idx = x[I] .> 0
+    fmax,g_idx = findmax(x[I][pos_idx])
+    thres_idx = SPL.(x[I][pos_idx]) .- SPL.(fmax) .<= int_thres
+    return sum(x[I][pos_idx][thres_idx])
 end
 
 function sourceintegration(x::Vector{T1},env::Environment,limits::Vector{Vector{T2}};int_thres=Inf) where {T1,T2}
