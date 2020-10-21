@@ -31,7 +31,7 @@ function beamforming(E::Environment)
     @views @inbounds for j in 1:Nf
         st = E.steeringvec.arr[:,:,j]
         @. st = complex(w[:,j].*real(st), imag(st))
-        AeroAcoustics.bf_col!(b[:,j],st,selectdim(CSM_s.arr, 3, j))
+        bf_col!(b[:,j],st,selectdim(CSM_s.arr, 3, j))
     end
     return FreqArray(b,fn)
 end

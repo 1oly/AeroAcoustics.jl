@@ -41,12 +41,12 @@ import DSP
     @test b.arr ≈ bd
     idx = 1 # Frequency index
     s1,p1 = findmax(reshape(b[:,idx],env.Nx,env.Ny))
-    bmax = ceil(SPL(sqrt(2).*s1))
-    @test bmax == 54.0
+    bmax = ceil(SPL(s1./sqrt(2)))
+    @test bmax == 51.0
     @test p1.I == (10,13) # (19,24) for n = 41
     p_1 = psf(env)[:,idx]
     s2,p2 = findmax(reshape(p_1,env.Nx,env.Ny))
-    @test ceil(SPL(sqrt(2).*s2)) == 94
+    @test ceil(SPL(s2./sqrt(2))) == 94
     @test p2.I == (floor(Int,env.Nx/2)+1,floor(Int,env.Ny/2)+1)
     pcol_1 = zeros(env.N)
     AeroAcoustics.psf_col!(pcol_1,env.steeringvec.arr[:,:,idx],floor(Int,env.N/2)+1)
@@ -58,4 +58,7 @@ import DSP
     id1,id2 = UnitRange.(p1.I.-2,p1.I.+2)
     limits = [env.rx[id1][1],env.rx[id1][end],env.ry[id2][1],env.ry[id2][end]]
     @test abs.(bmax-SPL.(sourceintegration(x[:,idx],env,limits))) <= 1 # Within 1dB of beamforming is OK (increase number of iterations to get better estimate)
+    #CLEAN-SC
+    x_clean = cleanSC(env;maxiter=10,ϕ=0.5)
+    @test abs.(bmax-SPL.(sourceintegration(x_clean[:,idx],env,limits)/sqrt(2))) <= 1
 end

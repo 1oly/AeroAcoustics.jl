@@ -20,6 +20,7 @@ export Environment,
        beamforming,
        psf,
        damas,
+       cleanSC,
        sourceintegration,
        octavebandlimits,
        octavebands,
@@ -37,6 +38,7 @@ include("csm.jl")
 include("beamforming.jl")
 include("psf.jl")
 include("damas.jl")
+include("cleansc.jl")
 include("sourceintegration.jl")
 
 
