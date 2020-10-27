@@ -25,22 +25,22 @@ selectfreqs(f,flim) = (f.>=flim[1]) .& (f.<=flim[2])
 
 function octavebands_nomial(n)
     if n == 1
-        return [16, 31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0]
+        return [16, 31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0, 32000.0]
     elseif n == 3
         return [12.5, 16, 20, 25.0, 31.5, 40.0, 50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0,
             250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0,1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0,
-            5000.0, 6300.0, 8000.0, 10000.0, 12500.0, 16000.0, 20000.0]
+            5000.0, 6300.0, 8000.0, 10000.0, 12500.0, 16000.0, 20000.0, 25000.0, 31500.0, 40000.0]
     else
         error("Value of `n` not supported. Try `n = 1` or `n = 3`")
     end
 end
 
 """
-    octavebands(n,flim=(25.,20000.),nomial::Bool=false)
+    octavebands(n,flim=(16.,40000.),nomial::Bool=false)
 
 Compute 1/n octave band center frequencies.
 """
-function octavebands(n,flim=(25.,20000.);nomial::Bool=false)
+function octavebands(n,flim=(16.,40000.);nomial::Bool=false)
     if nomial && (n==1 || n==3)
         fc = octavebands_nomial(n)
         f_inds = selectfreqs(fc,flim)
