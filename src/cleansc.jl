@@ -14,7 +14,7 @@ function cleanSC(E;maxiter=50,ϕ=0.5,stopn=10,peakidx=nothing)
     peakvector = Vector{Bool}(undef,E.Nf)
     peakvector .= false
     if peakidx != nothing
-        peakvector[intersect(peakidx,1:E2.Nf)] .= true
+        peakvector[intersect(peakidx,1:E.Nf)] .= true
     end
     @views @inbounds for j = 1:Nf
         _cleanSC!(x[:,j],steeringvec.arr[:,:,j],CSM_s.arr[:,:,j],maxiter,ϕ,stopn,peakvector[j])
