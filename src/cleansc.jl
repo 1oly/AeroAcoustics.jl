@@ -8,7 +8,7 @@ References:
 
 With inspiration from https://github.com/acoular/acoular/blob/66cba3cffb3bc72602c869f99347be76798f4ac1/acoular/fbeamform.py#L1496
 """
-function cleanSC(E;maxiter=50,ϕ=0.5,stopn=10,peakidx=nothing)
+function cleanSC(E;maxiter=50,ϕ=0.5,stopn=10,idx=0,peakidx=nothing)
     @unpack CSM_s,steeringvec,M,N,Nf,fn = E
     x = zeros(N,Nf)
     peakvector = Vector{Bool}(undef,E.Nf)
@@ -17,12 +17,12 @@ function cleanSC(E;maxiter=50,ϕ=0.5,stopn=10,peakidx=nothing)
         peakvector[intersect(peakidx,1:E.Nf)] .= true
     end
     @views @inbounds for j = 1:Nf
-        _cleanSC!(x[:,j],steeringvec.arr[:,:,j],CSM_s.arr[:,:,j],maxiter,ϕ,stopn,peakvector[j])
+        _cleanSC!(x[:,j],steeringvec.arr[:,:,j],CSM_s.arr[:,:,j],maxiter,ϕ,stopn,idx,peakvector[j])
     end
     return FreqArray(x,E.fn)
 end
 
-function _cleanSC!(x,st,csm,maxiter,ϕ,stopn,peakidx::Bool)
+function _cleanSC!(x,st,csm,maxiter,ϕ,stopn,idx,peakidx::Bool)
     M,N = size(st)
     g = similar(st[:,1])
     h = similar(g)
@@ -43,7 +43,7 @@ function _cleanSC!(x,st,csm,maxiter,ϕ,stopn,peakidx::Bool)
         end
         Pmax = zeros(N)
         Pmax[max_idx] = 1
-        if peakidx && i == 1
+        if peakidx && i in idx
             csm -= max_val[i]*(h*h')
         else
             x .+= ϕ*max_val[i]*Pmax
