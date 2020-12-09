@@ -32,7 +32,7 @@ function refraction_correction(E,h1=1.5,h2=E.z0-h1)
             b0 = Δx/sqrt(Δx^2+Δy^2)
             Δz2,Δz3 = h1,h2
             
-            res = nlsolve((F,x)->f!(F,x,Δx,Δz2,Δz3,E.Ma,Δy),[a0,b0])
+            res = nlsolve((F,x)->f!(F,x,Δx,Δz2,Δz3,E.Ma,Δy),[a0,b0],autoscale=false)
             a,b = res.zero
             
             
