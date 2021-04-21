@@ -36,7 +36,12 @@ function _cleanSC!(x,st,csm,maxiter,ϕ,stopn,peak_removal,trust_indices)
     dirtyMap = zeros(N)
     for i in 1:maxiter
         AeroAcoustics.bf_col!(dirtyMap,st,csm)
-        max_val[i],max_idx = findmax(filter(!isnan,dirtyMap))
+        # Numerical issue with Amiet correction can cause NaNs
+        if isempty(filter(!isnan,dirtyMap)) 
+            @goto stop
+        else
+            max_val[i],max_idx = findmax(filter(!isnan,dirtyMap))
+        end
         g .= st[:,max_idx]
         h .= g
         for _ in 1:20
