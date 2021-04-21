@@ -36,7 +36,7 @@ function _cleanSC!(x,st,csm,maxiter,ϕ,stopn,peak_removal,trust_indices)
     dirtyMap = zeros(N)
     for i in 1:maxiter
         AeroAcoustics.bf_col!(dirtyMap,st,csm)
-        max_val[i],max_idx = findmax(dirtyMap)
+        max_val[i],max_idx = findmax(filter(!isnan,dirtyMap))
         g .= st[:,max_idx]
         h .= g
         for _ in 1:20
