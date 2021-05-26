@@ -57,7 +57,7 @@ function _cleanSC!(x,st,csm,maxiter,ϕ,stopn,peak_removal,trust_indices)
             x .+= ϕ*max_val[i]*Pmax
             csm -= ϕ*max_val[i]*(h*h')
         else
-            csm -= max_val[i]*(h*h')
+            csm -= ϕ*max_val[i]*(h*h')
         end
         
         csm[Diagonal(ones(Bool,M))] .= 0
