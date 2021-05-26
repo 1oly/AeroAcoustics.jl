@@ -53,11 +53,16 @@ function _cleanSC!(x,st,csm,maxiter,ϕ,stopn,peak_removal,trust_indices)
         Pmax = zeros(N)
         Pmax[max_idx] = 1
         
-        if peak_removal && max_idx ∈ trust_indices
+        if peak_removal
+            if max_idx ∈ trust_indices
+                x .+= ϕ*max_val[i]*Pmax
+                csm -= ϕ*max_val[i]*(h*h')
+            else
+                csm -= max_val[i]*(h*h')
+            end
+        else
             x .+= ϕ*max_val[i]*Pmax
             csm -= ϕ*max_val[i]*(h*h')
-        else
-            csm -= max_val[i]*(h*h')
         end
         
         csm[Diagonal(ones(Bool,M))] .= 0
