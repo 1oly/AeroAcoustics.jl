@@ -40,7 +40,8 @@ function _cleanSC!(x,st,csm,maxiter,ϕ,stopn,peak_removal,trust_indices)
         if isempty(filter(!isnan,dirtyMap)) 
             @goto stop
         else
-            max_val[i],max_idx = findmax(filter(!isnan,dirtyMap))
+            dirtyMap[ isnan.(dirtyMap)] .= -Inf
+            max_val[i],max_idx = findmax(dirtyMap)
         end
         g .= st[:,max_idx]
         h .= g
