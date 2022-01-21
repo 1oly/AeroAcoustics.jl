@@ -6,19 +6,14 @@ import DSP
     csm_ref = h5open("data/test1_csm.h5", "r") do file
         read(file, "CsmData/csmReal")+im*read(file, "CsmData/csmImag")
     end
-    t = h5open("data/test1_timeseries.h5", "r") do file
-        read(file, "MicrophoneData/microphoneDataPa")
-    end
+    fc = h5read("data/test1_csm.h5", "CsmData")["binCenterFrequenciesHz"]
 
     # Test csm
     fs = h5readattr("data/test1_csm.h5", "CsmData")["fs"]
     n = h5readattr("data/test1_csm.h5", "CsmData")["n"]
-    csm_test = csm(t;n=n,noverlap=div(n,2),fs=fs,win=DSP.hanning(n))
-    #@test csm_test.arr ≈ csm_ref
 
     # Setup beamforming
-    fc2 = h5read("data/test1_csm.h5", "CsmData")["binCenterFrequenciesHz"]
-    @test csm_test.fc==fc2
+    fc = h5read("data/test1_csm.h5", "CsmData")["binCenterFrequenciesHz"]
     z0 = h5readattr("data/test1_csm.h5", "CsmData")["z0"]
     micgeom = h5read("data/test1_csm.h5", "CsmData")["arrayGeom"]
     @test size(micgeom) == (3,84)
@@ -33,7 +28,7 @@ import DSP
                       Ny = 21,
                       xlim=(-0.5,0.5),
                       ylim=(-0.5,0.5),
-                      CSM=csm_test)
+                      CSM=FreqArray(csm_ref,fc))
 
     steeringvectors!(env)
     b = beamforming(env)
@@ -42,7 +37,7 @@ import DSP
     idx = 1 # Frequency index
     s1,p1 = findmax(reshape(b[:,idx],env.Nx,env.Ny))
     bmax = ceil(SPL(s1./sqrt(2)))
-    @test bmax == 51.0
+    @test bmax == 49.0
     @test p1.I == (10,13) # (19,24) for n = 41
     p_1 = psf(env)[:,idx]
     s2,p2 = findmax(reshape(p_1,env.Nx,env.Ny))
