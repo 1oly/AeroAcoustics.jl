@@ -1,11 +1,5 @@
 image: julia:1.6                # image comes from Docker hub
 
-variables:
-  DOCKER_TLS_CERTDIR: ""
-
-services:
-  - docker:stable-dind
-
 before_script:
   - apt-get -qq update; apt-get -y install git hdf5-tools
   - julia --project=@. -e "import Pkg; Pkg.build()"
@@ -15,7 +9,6 @@ default:
     - julia --project=@. -e "import Pkg; Pkg.test(; coverage = true)"
     - julia --project=test/coverage -e 'import Pkg; Pkg.instantiate()'
     - julia --project=test/coverage test/coverage/coverage-summary.jl
-
 
 pages:
   stage: deploy
