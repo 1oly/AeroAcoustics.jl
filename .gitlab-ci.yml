@@ -1,10 +1,10 @@
-default:
-  image: julia:1.6.5              # image comes from Docker hub
+image: julia:1.6.5              # image comes from Docker hub
 
-  before_script:
-    - apt-get -qq update; apt-get -y install git hdf5-tools
-    - julia --project=@. -e "import Pkg; Pkg.build()"
-    
+before_script:
+  - apt-get -qq update; apt-get -y install git hdf5-tools
+  - julia --project=@. -e "import Pkg; Pkg.build()"
+
+default:
   script:
     - julia --project=@. -e "import Pkg; Pkg.test(; coverage = true)"
     - julia --project=test/coverage -e 'import Pkg; Pkg.instantiate()'
