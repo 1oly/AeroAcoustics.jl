@@ -1,4 +1,8 @@
 image: julia:1.6                # image comes from Docker hub
+
+variables:
+  DOCKER_TLS_CERTDIR: ""
+
 services:
   - docker:stable-dind
 
