@@ -29,11 +29,5 @@ Contributions are welcome!
 
 [coverage-img]: https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/badges/master/coverage.svg
 
-[travis-img]: https://travis-ci.org/1oly/AeroAcoustics.jl.svg?branch=master
-[travis-url]: https://travis-ci.org/1oly/AeroAcoustics.jl
-
-[appveyor-img]: https://ci.appveyor.com/api/projects/status/l5igmy3p3q5f4n6d/branch/master?svg=true
-[appveyor-url]: https://ci.appveyor.com/project/1oly/aeroacoustics-jl/branch/master
-
 [docs-img]: https://img.shields.io/badge/docs-latest-blue.svg
 [docs-url]: https://ollyl.pages.windenergy.dtu.dk/AeroAcoustics.jl/
