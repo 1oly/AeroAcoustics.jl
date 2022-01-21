@@ -1,6 +1,6 @@
 # AeroAcoustics
 
-[![][pipeline-img]][pipeline-url] [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] [![][coverage-img]][pipeline-url] [![][docs-img]][docs-url]
+[![][pipeline-img]][pipeline-url]  [![][coverage-img]][pipeline-url] [![][docs-img]][docs-url]
 
 A [julia](http://julialang.org) package for Aeroacoustics.
 
