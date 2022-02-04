@@ -6,7 +6,6 @@ import DSP
     csm_ref = h5open("data/test1_csm.h5", "r") do file
         read(file, "CsmData/csmReal")+im*read(file, "CsmData/csmImag")
     end
-    fc = h5read("data/test1_csm.h5", "CsmData")["binCenterFrequenciesHz"]
 
     # Test csm
     fs = h5readattr("data/test1_csm.h5", "CsmData")["fs"]
