@@ -2,8 +2,15 @@ using Documenter, AeroAcoustics
 
 makedocs(
     modules = [AeroAcoustics],
+    #format = Documenter.HTML(),
     checkdocs = :none,
     sitename = "AeroAcoustics.jl",
+    authors = "Oliver Lylloff",
     pages = Any["index.md"],
-    repo = "https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/blob/{commit}{path}#{line}"
 )
+
+deploydocs(
+  repo   = "github.com/1oly/AeroAcoustics.jl.git",
+  #target = "build",
+)
+
