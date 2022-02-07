@@ -1,6 +1,6 @@
 # AeroAcoustics
-
-[![][pipeline-img]][pipeline-url]  [![][coverage-img]][pipeline-url] [![][docs-img]][docs-url]
+[![CI](https://github.com/1oly/AeroAcoustics.jl/workflows/CI/badge.svg)](https://github.com/1oly/AeroAcoustics.jl/actions?query=workflow%3ACI)
+[![Codecov](https://codecov.io/gh/1oly/AeroAcoustics.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/1oly/AeroAcoustics.jl)
 
 A [julia](http://julialang.org) package for Aeroacoustics.
 
@@ -23,11 +23,3 @@ pkg> add https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl
 ## Contribution
 Contributions are welcome!
 
-
-[pipeline-img]: https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/badges/master/pipeline.svg
-[pipeline-url]: https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/commits/master
-
-[coverage-img]: https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl/badges/master/coverage.svg
-
-[docs-img]: https://img.shields.io/badge/docs-latest-blue.svg
-[docs-url]: https://ollyl.pages.windenergy.dtu.dk/AeroAcoustics.jl/
