@@ -72,3 +72,4 @@ bdB = SPL.(reshape(b[:,1],E.Nx,E.Ny))
 pcolormesh(E.rx,E.ry,bdB)
 colorbar()
 ```
+Check out `examples/Quick_start.ipynb` to see the output image.
