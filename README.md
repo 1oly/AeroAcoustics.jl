@@ -3,7 +3,9 @@
 [![Codecov](https://codecov.io/gh/1oly/AeroAcoustics.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/1oly/AeroAcoustics.jl)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://1oly.github.io/AeroAcoustics.jl/dev)
 
-A [julia](http://julialang.org) package for Aeroacoustics.
+A [julia](http://julialang.org) package for Aeroacoustics and acoustic imaging.
+
+![Image](presentation.png?raw=true "Title")
 
 ## Overview
 
