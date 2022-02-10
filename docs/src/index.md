@@ -3,14 +3,14 @@
 AeroAcoustics.jl is a package for post-processing of microphone array measurements.
 It aims to provide basic functionality for computing cross-spectral matrices and frequency-domain beamforming.
 
-The package repository is here: <https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl>
+The package repository is here: <https://github.com/1oly/AeroAcoustics.jl>
 
 This package has been developed over several years, but has reached a stable state. A brief introduction to the usage is given below.
 
 ## Installation
 From the julia REPL:  
 ```
-pkg> add https://gitlab.windenergy.dtu.dk/ollyl/AeroAcoustics.jl
+pkg> add AeroAcoustics
 ```   
 and optionally running the tests:  
 ```
