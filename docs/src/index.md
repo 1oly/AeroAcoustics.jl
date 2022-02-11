@@ -73,3 +73,32 @@ pcolormesh(E.rx,E.ry,bdB)
 colorbar()
 ```
 Check out `examples/Quick_start.ipynb` to see the output image.
+
+### Advanced methods
+Two advanced and widely used methods for improving the beamforming image are
+Clean-SC and DAMAS, which can be easily called by:   
+```
+xSC = cleanSC(E)
+xD = damas(E,b)
+```
+Check out `examples/Quick_start.ipynb` to see examples of the acoustic images.
+
+### Source integration
+In a typical workflow, the acoustic images are used to focus on selected regions
+of the spatial domain and extract a spectrum. The source integration is called with
+```
+sourceintegration(x,E,int_region)
+```
+where `x` is the source map, `E` the environment struct and `int_region` describe the limits of
+a square to integrate over. A utility function `AeroAcoustics.point_to_region` can help define limits 
+by giving a point and extent as input, e.g.,   
+```
+src_pos = (0.0, 1.0) # Point to integrate
+dxdy = (0.5,0.5) # Size of square extenting from src_pos 
+int_region = AeroAcoustics.point_to_region(src_pos,dxdy)
+4-element Vector{Float64}:
+ -0.25
+  0.25
+  0.75
+  1.25
+```

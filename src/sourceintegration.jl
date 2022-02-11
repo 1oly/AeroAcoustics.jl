@@ -87,3 +87,16 @@ function point_to_region(src::T,dxdy) where T <: AbstractArray
     end
     return out
 end
+
+"""
+    SPI(b::FreqArray,E::Environment,dxdy,limits)
+
+Convenience function to normalize source integration of a beamforming result.
+"""
+function SPI(b::FreqArray,E::Environment,dxdy,limits)
+    midpoint = (sum(extrema(E.rx))/2,sum(extrema(E.ry))/2)
+    limits_psf  = AeroAcoustics.point_to_region(midpoint,dxdy)
+    srcint_psf = sourceintegration(psf(E),E,limits_psf)
+    srcint_b = sourceintegration(b,E,limits)
+    return FreqArray(srcint_b./srcint_psf,srcint_b.fc)
+end
