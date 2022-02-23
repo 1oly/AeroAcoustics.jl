@@ -62,6 +62,6 @@ import DSP
     # FISTA
     x_fista = fista(env,b,ps)
     x_fista2 = fista(env,b,ps,[b.fc[idx]])
-    @test x_fista[:,idx] ≈ x_fista2
+    @test isapprox(x_fista[:,idx], x_fista2[:]; rtol = 1e-6)
     @test abs.(bmax-SPL.(sourceintegration(x_fista[:,idx],env,limits))) <= 1.0 
 end
