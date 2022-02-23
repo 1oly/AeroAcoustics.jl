@@ -5,6 +5,7 @@ using Statistics
 using NLsolve
 using Parameters
 using LazyArrays
+using FFTW
 import DSP
 
 import Base.length,
@@ -28,7 +29,9 @@ export Environment,
        enbw,
        coherence_weights,
        DR!,
-       DR
+       DR,
+       SPI,
+       fista
 
 
 include("utils.jl")
@@ -40,7 +43,7 @@ include("psf.jl")
 include("damas.jl")
 include("cleansc.jl")
 include("sourceintegration.jl")
-
+include("fista.jl")
 
 reshape(x::FreqArray,dims::Vararg{Int64,N}) where N = FreqArray(reshape(x.arr,dims...),x.fc)
 
