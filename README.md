@@ -11,17 +11,18 @@ A [julia](http://julialang.org) package for Aeroacoustics and acoustic imaging.
 
 This package provide methods for working with microphone array measurements. Utilities for processing
 beamforming and other acoustic imaging methods are collected in this package, and it is the intention, that 
-a suite of both well-known and state of the art methods is continuously updated. The current set of methods include:   
+a suite of both well-known and state of the art methods is continuously updated. 
 
-- Frequency-domain beamforming - and source power integration (SPI) 
-- DAMAS   
-Brooks, T. F. et al. (2006). *A deconvolution approach for the mapping of acoustic sources (DAMAS) determined from phased microphone arrays*. J.Sound.Vib. 294(4), 856–879. https://doi.org/10.1016/j.jsv.2005.12.046
-- CLEAN-SC   
-Sijtsma, P. (2007). *CLEAN based on spatial source coherence*. Int.J.Aeroacou. 6(4), 357–374.
+The current set of methods include conventional frequency domain beamforming (CBF) with source power integration (SPI), and the following advanced methods:
+
+| Method  | Reference  |
+|---------|------------|
+|DAMAS   | Brooks, T. F. et al. (2006). *A deconvolution approach for the mapping of acoustic sources (DAMAS) determined from phased microphone arrays*. J. Sound. Vib. 294(4), 856–879. https://doi.org/10.1016/j.jsv.2005.12.046  |
+|CLEAN-SC   |  Sijtsma, P. (2007). *CLEAN based on spatial source coherence*. Int.J.Aeroacou. 6(4), 357–374. https://doi.org/10.1260/147547207783359459 |
+|FISTA   | - Beck, A., & Teboulle, M. (2009). *A fast iterative shrinkage-thresholding algorithm for linear inverse problems.* SIAM J. Imag. Sci., 2(1), 183-202. https://doi.org/10.1137/080716542 <br />- Lylloff, O., et al. (2015). *Improving the efficiency of deconvolution algorithms for sound source localization*. J. Acou. Soc. Am, 138(1), 172-180. https://doi.org/10.1121/1.4922516 |
 
 On the roadmap is:   
 - Functional/adaptive/orthogonal beamforming
-- FISTA
 - CMF
 
 Additional methods can also be added by contributors to this repository. The code structure enables an easy and modular addition of new methods. 
