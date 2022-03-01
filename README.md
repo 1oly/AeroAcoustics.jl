@@ -17,15 +17,22 @@ The current set of methods include conventional frequency domain beamforming (CB
 
 | Method  | Reference  |
 |---------|------------|
-|DAMAS   | Brooks, T. F. et al. (2006). *A deconvolution approach for the mapping of acoustic sources (DAMAS) determined from phased microphone arrays*. J. Sound. Vib. 294(4), 856–879. https://doi.org/10.1016/j.jsv.2005.12.046  |
+|DAMAS   | Brooks, T. F. et al. (2006). *A deconvolution approach for the mapping of acoustic sources (DAMAS) determined from phased microphone arrays*. J. Sound Vib. 294(4), 856–879. https://doi.org/10.1016/j.jsv.2005.12.046  |
 |CLEAN-SC   |  Sijtsma, P. (2007). *CLEAN based on spatial source coherence*. Int.J.Aeroacou. 6(4), 357–374. https://doi.org/10.1260/147547207783359459 |
 |FISTA   | - Beck, A., & Teboulle, M. (2009). *A fast iterative shrinkage-thresholding algorithm for linear inverse problems.* SIAM J. Imag. Sci., 2(1), 183-202. https://doi.org/10.1137/080716542 <br />- Lylloff, O., et al. (2015). *Improving the efficiency of deconvolution algorithms for sound source localization*. J. Acou. Soc. Am, 138(1), 172-180. https://doi.org/10.1121/1.4922516 |
 
 On the roadmap is:   
-- Functional/adaptive/orthogonal beamforming
-- CMF
+
+| Method  | Reference  |
+|---------|------------|
+Functional beamforming | Dougherty, R.P. (2014). *Functional beamforming*. 5th Berlin Beamforming Conference, February 19–20 2014, Berlin, Germany, GFaI, e.V., Berlin. |
+Orthogonal beamforming | Sarradj, E. (2010). *A fast signal subspace approach for the determination of absolute levels from phased microphone array measurements*. J. Sound Vib. 329(9), 1553–1569. https://doi.org/10.1016/j.jsv.2009.11.009|
+Spectral Estimation Method (SEM) / <br> Covariance Matrix Fitting (CMF) | Blacodon, D. et al. (2004). *Level estimation of extended acoustic sources using a parametric method*. J. Airc. 41, 1360–1369. https://doi.org/10.2514/1.3053 <br> Yardibi, T. et al. (2010). *A covariance fitting approach for correlated acoustic source mapping*. J. Acoust. Soc. Am. 127(5), 2920–2931. https://doi.org/10.1121/1.3365260|
+Generalized Inverse Beamforming (GIBF) | Suzuki, T. (2011). *L1 generalized inverse beamforming algorithm resolving coherent/incoherent, distributed and multipole sources*. J. Sound Vib. 330(24), 5835–5851. https://doi.org/10.1016/j.jsv.2011.05.021|
 
 Additional methods can also be added by contributors to this repository. The code structure enables an easy and modular addition of new methods. 
+
+Denoising of the cross-spectral matrix is another important part of succesful acoustic imaging. Several different methods are on the roadmap to be implemented.
 
 Source integration of acoustic images is another important feature of this package. 
 The output can be produced in narrow-band, 1/3rd or 1/12th octave bands. 
