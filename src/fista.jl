@@ -22,7 +22,6 @@ Performs deconvolution with FISTA with a nonnegativity constraint for all freque
 - Lylloff, O., Fernández-Grande, E., Agerkvist, F., Hald, J., Tiana Roig, E., & Andersen, M. S. (2015). Improving the efficiency of deconvolution algorithms for sound source localization. 
     The journal of the acoustical society of America, 138(1), 172-180
 """
-
 function fista(env::Environment,b::FA,p::FA,f::T=env.fn; tol::Real=1e-6, maxit::Int=1000) where {T <: AbstractArray, FA <: FreqArray}
     env.fn == f ? (f_inds=1:env.Nf) : (f_inds = findall(x->x in f, env.fn))
     x = zeros(size(b,1),length(f_inds))
