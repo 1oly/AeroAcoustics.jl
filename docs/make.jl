@@ -6,7 +6,7 @@ makedocs(
     checkdocs = :none,
     sitename = "AeroAcoustics.jl",
     authors = "Oliver Lylloff",
-    pages = Any["index.md"],
+    pages = ["index.md","API Reference" => "reference.md"]
 )
 
 deploydocs(
