@@ -50,7 +50,8 @@ E = Environment(
     Nx = 21,
     Ny = 21,
     xlim=(-0.5,0.5),
-    ylim=(-0.5,0.5)
+    ylim=(-0.5,0.5),
+    multi_thread = true # multi-threading can be enabled globally like this
     )
 ```
 Where the measurement distance `z0`, the microphone geometry `micgeom`, and the csm `CSM` are required variables. 

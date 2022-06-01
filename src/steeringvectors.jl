@@ -81,17 +81,19 @@ end
 
 Pre-compute steeringvectors for beamforming using an `Environment` with the needed parameters.
 """
-function steeringvectors(E::Environment)
+function steeringvectors(E::Environment;multi_thread=E.multi_thread)
+    _foreach = AeroAcoustics.check_multithread(multi_thread)
     @unpack fn,c,M,N,Nf,D,D0 = E
     kw = 2pi*fn/c
     vi = Array{ComplexF64,3}(undef,N,M,Nf)
-    for j in 1:Nf
+    @views @inbounds _foreach(1:Nf) do j
         vi[:,:,j] .= 1 ./(D.*D0.*sum(1 ./D.^2,dims=2)).*exp.(-im.*kw[j].*(D.-D0))
     end
     steeringvec = FreqArray(permutedims(vi,(2,1,3)),fn)
 end
 
-function steeringvectors!(E::Environment)
+function steeringvectors!(E::Environment;multi_thread=E.multi_thread)
+    _foreach = AeroAcoustics.check_multithread(multi_thread)
     @unpack fn,c,M,N,Nf,D,D0,Ma,h = E
     vi = Array{ComplexF64,3}(undef,N,M,Nf)
 
@@ -99,7 +101,7 @@ function steeringvectors!(E::Environment)
         w = 2pi*fn
         dx,pc_pm = refraction_correction(E,h)
         ta = dx./c
-        for j in 1:Nf
+        @views @inbounds _foreach(1:Nf) do j
             vi[:,:,j] .= 1 ./(ta.*c.*D0.*sum(1 ./(ta.*c).^2,dims=2)).*exp.(-im.*w[j].*ta)
         end
         if E.ampcorr
@@ -109,7 +111,7 @@ function steeringvectors!(E::Environment)
         end
     else
         kw = 2pi*fn/c
-        for j in 1:Nf
+        @views @inbounds _foreach(1:Nf) do j
             vi[:,:,j] .= 1 ./(D.*D0.*sum(1 ./D.^2,dims=2)).*exp.(-im.*kw[j].*(D.-D0))
         end
     end

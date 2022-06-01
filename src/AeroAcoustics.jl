@@ -7,6 +7,7 @@ using Parameters
 using LazyArrays
 using FFTW
 import DSP
+using ThreadsX
 
 import Base.length,
        Base.push!,
@@ -104,4 +105,9 @@ function DR(CSM::FreqArray)
     return FreqArray(CSMd,CSM.fc)
 end
 
+function check_multithread(multi_thread)
+    _foreach = multi_thread ? ThreadsX.foreach : Base.foreach
+    return _foreach
 end
+
+end # Module

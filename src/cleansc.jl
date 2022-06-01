@@ -8,7 +8,8 @@ CLEAN-SC algorithm for source identification and quantification optionally setti
 
 With inspiration from https://github.com/acoular/acoular/blob/66cba3cffb3bc72602c869f99347be76798f4ac1/acoular/fbeamform.py#L1496
 """
-function cleanSC(E;maxiter=50,ϕ=0.5,stopn=10,peak_removal=false,trust_region=nothing)
+function cleanSC(E;maxiter=50,ϕ=0.5,stopn=10,peak_removal=false,trust_region=nothing,multi_thread=E.multi_thread)
+    _foreach = AeroAcoustics.check_multithread(multi_thread)
     @unpack CSM_s,steeringvec,M,N,Nf,fn = E
     x = zeros(N,Nf)
     
@@ -20,7 +21,7 @@ function cleanSC(E;maxiter=50,ϕ=0.5,stopn=10,peak_removal=false,trust_region=no
         trust_indices = LinearIndices((E.Nx,E.Ny))
     end
     
-    @views @inbounds for j = 1:Nf
+    @views @inbounds _foreach(1:Nf) do j
         _cleanSC!(x[:,j],steeringvec.arr[:,:,j],CSM_s.arr[:,:,j],maxiter,ϕ,stopn,peak_removal,trust_indices)
     end
     return FreqArray(x,E.fn)
