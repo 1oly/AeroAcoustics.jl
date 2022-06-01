@@ -50,7 +50,7 @@ function _fista!(x,b,psf,gam;maxit=1000,tol=1e-6)
         x .= max.(real.(y),0.0)
         # stopping criterion
         if norm(x_ex-x)/gam <= tol*(1+norm(x))
-            println("breaking at iter = $(it)...")
+            #println("breaking at iter = $(it)...")
             break
         end
     end

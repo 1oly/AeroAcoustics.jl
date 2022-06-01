@@ -43,13 +43,15 @@ setup, constants, and stores the relevant data together. The microphone array is
 - `c::Real=343.`: Speed of sound [m/s].
 - `Ma::Real=0.0`: Mach number (sign determines flow direction)
 - `h::Real=0.0`: Distance from array center to shear layer (Amiet correction) should be supplied when `Ma != 0`.
-
+- `multi_thread::Bool = false`: Enable multi-threading via the ThreadsX package.
 """
 @with_kw mutable struct Environment <: AeroAcousticType
+    # Required:
     micgeom::Matrix{<:AbstractFloat}
     z0::Real
     CSM::FreqArray
     flim::NTuple{2,Real} = extrema(CSM.fc)
+    # Optional:
     Nx::Int = 21
     Ny::Int = 21
     xlim::NTuple{2,Real} = (-1.,1.)
@@ -59,6 +61,10 @@ setup, constants, and stores the relevant data together. The microphone array is
     c::Real = 343.0 # Speed of sound
     Ma::Real = 0.0 # Flow Mach speed (in positive x-direction) TODO: Generalize to NTuple{3,Real}
     h::Real = 0.0 # Distance from array center to shear layer
+    multi_thread = false
+    #if multi_thread #&& Threads.nthreads() == 1
+    #    @warn "Multi-threading is enabled but julia was started with only 1 thread. This could lead to errornous results. Restart julia with `julia -t auto` to enable multi-threading."
+    #end
     ### Compute extra parameters
     dr::Bool = false
     Cinds = (CSM.fc.>=flim[1]) .& (CSM.fc.<=flim[2])
