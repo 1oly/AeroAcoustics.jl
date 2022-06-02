@@ -80,3 +80,18 @@ end
     win = DSP.rect(n)
     @test enbw(fs,win) == fs/n
 end
+
+@testset "FreqArray:" begin
+    T = ComplexF64
+    A = ones(ComplexF64,10,10,2)
+    b = ones(Int64,2)
+    F = FreqArray(A,b)
+    @test typeof(FreqArray(A,b)) === FreqArray{T,3,typeof(b)}
+    @test typeof(F) === typeof(F/10) === typeof(10/F)
+    @test typeof(F) === typeof(F*10) === typeof(10*F)
+    @test F.fc == (F*10).fc == (10*F).fc
+    @test F.fc == (F/10).fc == (10/F).fc
+    @test (F*10)[1] == 10.0 + 0.0im
+    F[1,1,1] = 2.0
+    @test typeof(F) == FreqArray{T,3,typeof(b)} # is it still a FreqArray?
+end

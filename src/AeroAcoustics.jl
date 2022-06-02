@@ -12,6 +12,10 @@ using ThreadsX
 import Base.length,
        Base.push!,
        Base.reshape
+       #Base.*,
+       #Base./,
+       #Base.+,
+       #Base.-
 
 export Environment,
        FreqArray,
