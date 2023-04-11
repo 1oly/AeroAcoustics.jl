@@ -4,7 +4,7 @@ keywords = ["AeroAcoustics"]
 license = "MIT"
 desc = "A package for post-processing of microphone array measurements"
 authors = ["Oliver Lylloff <ollyl@dtu.dk>"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
@@ -18,10 +18,10 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 ThreadsX = "ac1d9e8a-700a-412c-b207-f0111f4b6c0d"
 
 [compat]
-DSP = "0.6.7"
+DSP = "0.6.7, 0.7"
 Distances = "0.10"
 FFTW = "1.1"
-LazyArrays = "0.16"
+LazyArrays = "0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 1"
 NLsolve = "4.4"
 Parameters = "0.12.3"
 ThreadsX = "0.1.10"
