@@ -11,7 +11,7 @@ authors:
     orcid: 0000-0002-1596-107X
     affiliation: 1
 affiliations:
- - name: Technical University of Denmark (DTU), Dept. of Wind Energy
+ - name: Technical University of Denmark (DTU), Dept. of Wind and Energy Systems
    index: 1
 date: 10 February 2022
 bibliography: paper.bib
