@@ -7,12 +7,33 @@ struct FreqArray{T, N, AA<:AbstractVector} <: AbstractArray{T, N}
 end
 
 # Standard array functions and indexing
+FreqArray(arr::AbstractArray{T,N}, fc::AbstractVector) where {T,N} = 
+    FreqArray{eltype(arr),N,typeof(fc)}(arr, fc)
 Base.size(A::FreqArray) = size(A.arr)
 Base.axes(A::FreqArray) = axes(A.arr)
 Base.getindex(A::FreqArray, i::Int) = A.arr[i]
 Base.getindex(A::FreqArray{T, N}, I::Vararg{Int, N}) where {T, N} = A.arr[I...]
-Base.setindex!(A::FreqArray,v,i) = A.arr[i] = v
+Base.getindex(A::FreqArray, ::Colon) = A.arr[:]
+Base.getindex(A::FreqArray, kr::AbstractRange) = A.arr[kr]
 
+Base.setindex!(A::FreqArray, v, i::Int) = (A.arr[i] = v)
+Base.setindex!(A::FreqArray, v, I::Vararg{Int,N}) where {N} = (A.arr[I...] = v)
+Base.setindex!(A::FreqArray, v, ::Colon) = (A.Arr[:] .= v)
+Base.setindex!(A::FreqArray, v, kr::AbstractRange) = (A.arr[kr] .= v)
+
+Base.similar(A::FreqArray) = FreqArray(similar(A.arr),A.fc)
+Base.similar(A::FreqArray,::Type{T}) where T = FreqArray(similar(A.arr,T),A.fc)
+
+Base.:*(x::Number, A::FreqArray) = FreqArray(x*A.arr, A.fc)
+Base.:*(A::FreqArray, x::Number) = FreqArray(x*A.arr, A.fc)
+Base.:/(A::FreqArray, x::Number) = FreqArray(A.arr/x, A.fc)
+Base.:/(x::Number, A::FreqArray) = FreqArray(A.arr/x, A.fc)
+
+# TODO: check that A.fc == B.fc before computing:
+#Base.:*(B::FreqArray, A::FreqArray) = FreqArray(B.arr.*A.arr, A.fc)
+#Base.:*(A::FreqArray, B::FreqArray) = FreqArray(A.arr.*B.arr, A.fc)
+#Base.:/(A::FreqArray, B::FreqArray) = FreqArray(A.arr./B.arr, A.fc)
+#Base.:/(B::FreqArray, A::FreqArray) = FreqArray(B.arr./A.arr, A.fc)
 """
     Environment
 
