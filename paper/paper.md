@@ -31,7 +31,7 @@ A benchmark case study was conducted in 2017, where different research groups wi
 
 [^1]: An overview can be found here: [`beamforming-tools`](https://github.com/eac-ufsm/beamforming-tools) 
 
-`AeroAcoustics.jl` is the fast, entry-level open source software package, that fills the gap between the existing codebases available online. It has already been used in publications [@Fischer2022; @Verges; @Fischer2023], for research and commercial activities at the [Poul la Cour Wind Tunnel](https://www.plct.dk), and also in teaching [46600 Aeroacoustics](https://github.com/1oly/46600_aeroacoustics). 
+`AeroAcoustics.jl` is the fast, entry-level open source software package, that fills the gap between the existing codebases available online. It has already been used in publications [@Fischer2022; @Verges; @Fischer2023], a PhD thesis [@LylloffPhD], for research and commercial activities at the [Poul la Cour Wind Tunnel](https://www.plct.dk), and also in teaching [46600 Aeroacoustics](https://github.com/1oly/46600_aeroacoustics). 
 
 # Example
 To use the methods included in `AeroAcoustics.jl`, an `Environment` struct must be defined. This holds essential information about the computational domain, microphone array geometry and measurement data. The `Environment` struct is used by most functions in the `AeroAcoustics.jl` package, which makes it easy to add new methods and algorithms, because the required input is typically stored in `Environment`. Below is an example of this:
