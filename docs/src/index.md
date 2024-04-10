@@ -25,7 +25,7 @@ using HDF5, AeroAcoustics, PyPlot
 ```
 Open the hdf5 file from the test directory and assemble the data to a Complex array.
 ```
-csm_file = joinpath(dirname(@__DIR__),"test","data","test1_csm.h5")
+csm_file = joinpath(replace(dirname(pathof(AeroAcoustics)),"src"=>"test"),"data","test1_csm.h5")
 csm_ref = h5open(csm_file, "r") do file
     read(file, "CsmData/csmReal")+im*read(file, "CsmData/csmImag")
 end
@@ -86,11 +86,11 @@ Check out `examples/Quick_start.ipynb` to see examples of the acoustic images.
 
 ### Source integration
 In a typical workflow, the acoustic images are used to focus on selected regions
-of the spatial domain and extract a spectrum. The source integration is called with
+of the spatial domain and extract a spectrum. The source integration is used on an acoustic map, e.g., `b`, `xSC`, or `xD`, computed above.
 ```
-sourceintegration(x,E,int_region)
+sourceintegration(b,E,int_region)
 ```
-where `x` is the source map, `E` the environment struct and `int_region` describe the limits of
+where `b` is the source map, `E` the environment struct and `int_region` describe the limits of
 a square to integrate over. A utility function `AeroAcoustics.point_to_region` can help define limits 
 by giving a point and extent as input, e.g.,   
 ```
