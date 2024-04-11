@@ -52,8 +52,10 @@ pkg> test AeroAcoustics
 The test suite will download an external file, that is stored in `test/data`.
 ## Documentation
 The [documentation](https://1oly.github.io/AeroAcoustics.jl/dev/) gives an introduction to the packages and the API.
-## Contribution
-Contributions are welcome! Issues are tracked on [Github issue tracker](https://github.com/1oly/AeroAcoustics.jl/issues). If you want to add an new algorithm, you can fork this package and start developing your code and test it.
+
+## Community and contributions
+Any question regarding the installation, use or extension of the code can be posted in the [Github issue tracker](https://github.com/1oly/AeroAcoustics.jl/issues).
+If you want to add an new algorithm, you can fork this package and start developing your code and test it. If you wish to contribute to the general development, you can look for open issues or reach out to discuss further. Contributions are very welcome!
 
 ## Related packages
 Another noteworthy library for microphone array measurements is [Acoular](http://www.acoular.org), written in Python. AeroAcoustics.jl draws inspiration from Acoular but focusses only on the processing of *measurement data*, while Acoular also has functionality for generating simulated data.
