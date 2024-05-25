@@ -23,29 +23,29 @@ Aeroacoustics is an interdisciplinary research field situated between aerodynami
 [`AeroAcoustics.jl`](https://github.com/1oly/AeroAcoustics.jl) is a julia [@Bezanson2017] package for working with microphone arrays and acoustic imaging techniques. Methods for computing acoustic images often share the same codebase and utility functions, making them suitable candidates for a modular software package. It is the intention, that `AeroAcoustics.jl` can serve as a foundation for benchmarking existing methods and developing new ones within the aeroacoustics community. In addition to that, `AeroAcoustics.jl` is also a good candidate for teaching and entry-level programmers due to its simple API.
 
 # Statement of need
-The `AeroAcoustics.jl` package provides a collection of commonly used acoustic imaging techniques, developed by the aeroacoustic community, such as conventional beamforming [@Johnson1993a], DAMAS [@Brooks2006], and CleanSC [@Sijtsma2007]. The `AeroAcoustics.jl` package also include newer techniques found in the literature, e.g., fista [@Lylloff2015] and mean mutual-coherence weights [@Amaral2018]. 
+The `AeroAcoustics.jl` package provides a collection of commonly used acoustic imaging techniques, developed by the aeroacoustic community, such as conventional beamforming [@Johnson1993a], DAMAS [@Brooks2006], and CleanSC [@Sijtsma2007]. The `AeroAcoustics.jl` package also includes newer techniques found in the literature, e.g., fista [@Lylloff2015] and mean mutual-coherence weights [@Amaral2018]. 
 
-Only one other open-source software package exists with similar features; [`acoular`](https://github.com/acoular/acoular) [@acoular], which is written in Python. `Acoular` has a broader scope than `AeroAcoustics.jl`, including generation of simulated data, and analysis in both the time-domain and frequency-domain. A few repositories can be found online with code written in Matlab, but with limiting packaging functionality and few features; these do not constitute proper open-source software packages [^1]. 
+Only one other open-source software package exists with similar features; [`acoular`](https://github.com/acoular/acoular) [@acoular], which is written in Python. `Acoular` has a broader scope than `AeroAcoustics.jl`, including the generation of simulated data, and analysis in both the time-domain and frequency-domain. A few repositories can be found online with code written in Matlab, but with limiting packaging functionality and few features; these do not constitute proper open-source software packages [^1]. 
 
-A benchmark case study was conducted in 2017, where different research groups with different software used the same datasets and the same algorithms to compare results [@Bahr2017; @Sarradj2017]. One conclusion was that, although using seemingly the same algorithm written in different software codes, the results differed. The study did not compare the codes because most of the participants did not use publicly shared code. This is a testament to the need for open-source software, and `AeroAcoustics.jl` provides yet another option for the community to adopt open-source practises.
+A benchmark case study was conducted in 2017, where different research groups with different software used the same datasets and the same algorithms to compare results [@Bahr2017; @Sarradj2017]. One conclusion was that, although using seemingly the same algorithm written in different software codes, the results differed. The study did not compare the codes because most of the participants did not use publicly shared codes. This is a testament to the need for open-source software, and `AeroAcoustics.jl` provides yet another option for the community to adopt open-source practises.
 
 [^1]: An overview can be found here: [`beamforming-tools`](https://github.com/eac-ufsm/beamforming-tools) 
 
 `AeroAcoustics.jl` is the fast, entry-level open source software package, that fills the gap between the existing codebases available online. It has already been used in publications [@Fischer2022; @Verges; @Fischer2023], a PhD thesis [@LylloffPhD], for research and commercial activities at the [Poul la Cour Wind Tunnel](https://www.plct.dk), and also in teaching [46600 Aeroacoustics](https://github.com/1oly/46600_aeroacoustics). 
 
 # Example
-To use the methods included in `AeroAcoustics.jl`, an `Environment` struct must be defined. This holds essential information about the computational domain, microphone array geometry and measurement data. The `Environment` struct is used by most functions in the `AeroAcoustics.jl` package, which makes it easy to add new methods and algorithms, because the required input is typically stored in `Environment`. Below is an example of this:
+To use the methods included in `AeroAcoustics.jl`, an `Environment` struct must be defined. This holds essential information about the computational domain, microphone array geometry and measurement data. The `Environment` struct is used by most functions in the `AeroAcoustics.jl` package, which makes it easy to add new methods and algorithms because the required input is typically stored in `Environment`. Below is an example of this:
 ```
 E = Environment(
     z0=z0,
     micgeom=micgeom,
     CSM=CSM,
     flim=(3000,4000),
-    Nx = 21,
-    Ny = 21,
+    Nx=21,
+    Ny=21,
     xlim=(-0.5,0.5),
     ylim=(-0.5,0.5),
-    multi_thread = true
+    multi_thread=true
 )
 steeringvectors!(E)
 b = beamforming(E)
@@ -59,9 +59,9 @@ where
 - `xlim` and `ylim` is the desired extent of the acoustic image  
 - `multi_thread` can enable or disable multi-threading in appropriate functions across the `AeroAcoustics.jl` package.  
 
-In this example, `steeringvectors!(E)` mutates the argument and add steeringvectors to the `Environment`, which is required to compute acoustic images. The function is aware of the defined options in `Environment` and will only calculate for the appropriate domains, e.g., frequency limits, grid points, etc., reducing the computational load. Finally, the acoustic image is computed using `b = beamforming(E)`. 
+In this example, `steeringvectors!(E)` mutates the argument and adds steeringvectors to the `Environment`, which is required to compute acoustic images. The function is aware of the defined options in `Environment` and will only calculate for the appropriate domains, e.g., frequency limits, grid points, etc., reducing the computational load. Finally, the acoustic image is computed using `b = beamforming(E)`. 
 
-An example from a wind tunnel measurement is shown in Figure 1. Between the green walls, which is made of Kevlar and transparent to sound, an airflow encloses a section of an airfoil (shown in black), and acoustic measurements are conducted with a microphone array (blue dots) just on the other side of the green wall. The resulting acoustic image is overlayed the airfoil for visualization, using `Makie.jl` [@DanischKrumbiegel2021], and shows, that the dominant part of the acoustic energy arise from the trailing edge of the airfoil (as expected from theory).
+An example from a wind tunnel measurement is shown in Figure 1. Between the green walls, which are made of Kevlar and transparent to sound, an airflow encloses a section of an airfoil (shown in black), and acoustic measurements are conducted with a microphone array (blue dots) just on the other side of the green wall. The resulting acoustic image is overlayed the airfoil for visualization, using `Makie.jl` [@DanischKrumbiegel2021], and shows, that the dominant part of the acoustic energy arises from the trailing edge of the airfoil (as expected from theory).
 
 ![Example of beamforming in a wind tunnel](https://raw.githubusercontent.com/1oly/AeroAcoustics.jl/master/presentation.png "Presentation")
 
