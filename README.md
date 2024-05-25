@@ -2,8 +2,16 @@
 [![CI](https://github.com/1oly/AeroAcoustics.jl/workflows/CI/badge.svg)](https://github.com/1oly/AeroAcoustics.jl/actions?query=workflow%3ACI)
 [![Codecov](https://codecov.io/gh/1oly/AeroAcoustics.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/1oly/AeroAcoustics.jl)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://1oly.github.io/AeroAcoustics.jl/dev)
+[![status](https://joss.theoj.org/papers/9e20f1ec29f69e94bf0c9f1d2c22fa0d/status.svg)](https://joss.theoj.org/papers/9e20f1ec29f69e94bf0c9f1d2c22fa0d)
 
-A [julia](http://julialang.org) package for Aeroacoustics and acoustic imaging.
+A [Julia](http://julialang.org) package for Aeroacoustics and acoustic imaging.
+
+<p align="center">
+  <a href="#installation">Installation</a> •
+  <a href="#tests">Tests</a> •
+  <a href="#documentation">Documentation</a> •
+  <a href="#citation">Citation</a>
+</p>
 
 ![Image](presentation.png?raw=true "Title")
 
@@ -38,7 +46,7 @@ Source integration of acoustic images is another important feature of this packa
 The output can be produced in narrow-band, 1/3rd or 1/12th octave bands. 
 
 ## Installation
-First install [julia](http://julialang.org) and start julia in a terminal, [VS code](https://www.julia-vscode.org), [Jupyter](https://github.com/JuliaLang/IJulia.jl) or another application that can run julia. This package is registered and can be installed with
+First install [Julia](http://julialang.org) and start Julia in a terminal, [VS code](https://www.julia-vscode.org), [Jupyter](https://github.com/JuliaLang/IJulia.jl) or another application that can run Julia. This package is registered and can be installed with
 
 ```
 pkg> add AeroAcoustics
@@ -60,3 +68,18 @@ If you want to add an new algorithm, you can fork this package and start develop
 ## Related packages
 Another noteworthy library for microphone array measurements is [Acoular](http://www.acoular.org), written in Python. AeroAcoustics.jl draws inspiration from Acoular but focusses only on the processing of *measurement data*, while Acoular also has functionality for generating simulated data.
 
+## Citation
+If you use this package in your work, please cite the following:
+```
+@article{lylloff2024aeroacoustics, 
+doi = {10.21105.joss.06390}, 
+url = {https://doi.org/10.21105/joss.06390}, 
+year = {2024}, 
+publisher = {The Open Journal}, 
+journal = {Journal of Open Source Software},
+volume = {9}, 
+number = {97}, 
+pages = {6390}, 
+author = {Oliver Lylloff}, 
+title = {AeroAcoustics.jl: A Julia package for aeroacoustics} }
+``` 
