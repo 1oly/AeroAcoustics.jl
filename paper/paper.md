@@ -1,5 +1,5 @@
 ---
-title: 'AeroAcoustics.jl: A julia package for aeroacoustics'
+title: 'AeroAcoustics.jl: A Julia package for aeroacoustics'
 tags:
   - julia
   - acoustics
