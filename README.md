@@ -70,7 +70,7 @@ Another noteworthy library for microphone array measurements is [Acoular](http:/
 
 ## Citation
 If you use this package in your work, please cite the following:
-```
+```  
 @article{lylloff2024aeroacoustics, 
 doi = {10.21105.joss.06390}, 
 url = {https://doi.org/10.21105/joss.06390}, 

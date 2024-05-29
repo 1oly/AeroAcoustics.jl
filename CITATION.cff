@@ -1,0 +1,30 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Lylloff
+  given-names: Oliver
+  orcid: "https://orcid.org/0000-0002-1596-107X"
+contact:
+- family-names: Lylloff
+  given-names: Oliver
+  orcid: "https://orcid.org/0000-0002-1596-107X"
+doi: 10.5281/zenodo.11207482
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Lylloff
+    given-names: Oliver
+    orcid: "https://orcid.org/0000-0002-1596-107X"
+  date-published: 2024-05-28
+  doi: 10.21105/joss.06390
+  issn: 2475-9066
+  issue: 97
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 6390
+  title: "AeroAcoustics.jl: A Julia package for aeroacoustics"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.06390"
+  volume: 9
+title: "AeroAcoustics.jl: A Julia package for aeroacoustics"
