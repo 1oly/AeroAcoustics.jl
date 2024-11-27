@@ -25,14 +25,10 @@ end
 
 # flat_t is a helper function to reshape a S x M matrix to a vector of vectors
 function flat_t(t::AbstractArray{T,N}) where {T <: AbstractFloat, N}
-    if size(t,1) < size(t,2)
+    if size(t, 1) < size(t, 2)
         t = permutedims(t)
     end
-    ta = Array{Vector{T}}(undef,size(t,2))
-    for i in axes(t,2)
-        ta[i] = view(t,:,i)
-    end
-    return ta
+    return map(i -> view(t, :, i), axes(t, 2))
 end
 
 """
@@ -45,7 +41,8 @@ function csm(t::AbstractArray{T};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n
     csm(flat_t(t);n=n,noverlap=noverlap,fs=fs,win=win,scaling=scaling)
 end
 
-function csm(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n),scaling="spectrum") where T <: AbstractFloat
+function csm(t::Vector{<:AbstractVector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n),scaling="spectrum",multi_thread=true) where T <: AbstractFloat
+    _foreach = AeroAcoustics.check_multithread(multi_thread)
     M = length(t)
     Nf = div(n,2)+1
     nout = div((length(t[1]) - n), n - noverlap)+1
@@ -53,9 +50,12 @@ function csm(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(
     C = Array{Complex{T}}(undef,M,M,Nf)
     S = DSP.stft.(t, n, noverlap; fs=fs, window=win, onesided=true)
     Sc = conj.(S)
-    for m in 1:M
-        for j in m:M
-            C[j,m,:] .= dropdims(mean(LazyArray(@~ Sc[m].*S[j]),dims=2);dims=2)
+    @views @inbounds _foreach(1:Nf) do ω
+        for m in 1:M
+            for j in m:M
+                C[j, m, ω] = mean(Sc[m][ω,:] .* S[j][ω,:])
+                C[m, j, ω] = conj(C[j, m, ω])  
+            end
         end
     end
 
@@ -68,9 +68,6 @@ function csm(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(
     C .*= scale
     C[:,:,2:end-1] .*= 2
 
-    for ω in 1:Nf
-        C[:,:,ω] = Hermitian(C[:,:,ω],:L)
-    end
     return FreqArray(C,fc)
 end
 
@@ -85,7 +82,7 @@ function csm_slow(t::AbstractArray{T};n=1024,noverlap=div(n,2),fs=1,win=DSP.hann
     csm_slow(flat_t(t);n=n,noverlap=noverlap,fs=fs,win=win,scaling=scaling)
 end
 
-function csm_slow(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n),scaling="spectrum") where T <: AbstractFloat
+function csm_slow(t::Vector{<:AbstractVector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.hanning(n),scaling="spectrum") where T <: AbstractFloat
     M = length(t)
     Nf = div(n,2)+1
     nout = div((length(t[1]) - n), n - noverlap)+1
@@ -94,14 +91,19 @@ function csm_slow(t::Vector{Vector{T}};n=1024,noverlap=div(n,2),fs=1,win=DSP.han
     C = Array{Complex{T}}(undef,M,M,Nf)
     S = Array{Complex{T}}(undef,Nf,nout)
     Sc = similar(S)
+    
     for m in 1:M
-        stft!(Sc,t[m],n,noverlap; fs=fs, window=win, onesided=true)
-        conj!(Sc)
+        stft!(Sc, t[m], n, noverlap; fs=fs, window=win, onesided=true)  
+        conj!(Sc) 
+    
         for j in m:M
-            stft!(S,t[j],n,noverlap; fs=fs, window=win, onesided=true)
-            C[j,m,:] .= dropdims(mean(LazyArray(@~ Sc.*S),dims=2);dims=2)
+            stft!(S, t[j], n, noverlap; fs=fs, window=win, onesided=true) 
+            product = Sc .* S
+            mean_product = mean(product, dims=2)
+            C[j, m, :] .= dropdims(mean_product; dims=2)  # Drop the singleton dimension
         end
     end
+    
 
     if scaling == "density"
         scale = 1/(fs*sum(abs2,win))
