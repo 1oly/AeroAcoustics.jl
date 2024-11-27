@@ -4,7 +4,6 @@ using LinearAlgebra
 using Statistics
 using NLsolve
 using Parameters
-using LazyArrays
 using FFTW
 import DSP
 using ThreadsX
