@@ -4,7 +4,7 @@ keywords = ["AeroAcoustics"]
 license = "MIT"
 desc = "A package for post-processing of microphone array measurements"
 authors = ["Oliver Lylloff <ollyl@dtu.dk>"]
-version = "0.2.5"
+version = "0.2.6"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
