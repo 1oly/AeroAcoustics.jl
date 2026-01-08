@@ -18,6 +18,11 @@ remotefiles = [
         "c75ab472c9767435e801523e157526b936f31d53858119c58833c2a410699ab5",
         "https://raw.githubusercontent.com/MicrophoneArrayBenchmarking/airfoil-in-kevlar-walled-windtunnel/main/data/task6_DTU_AeroAcousticsjl_CBF_srcint.csv",
     ),
+    (
+        "data/DTU_PLCT_NACA63018_trip_5PS_5SS_U0_50_AoA_0_octave-12_CsmEss.h5",
+        nothing,
+        "https://data.dtu.dk/ndownloader/files/46174506",
+    ),
     #(
     #    "data/test1_timeseries.h5",
     #    "1f897db4039138f0c31f9cb340cce3304b85949f9f745200cc161f47426e45ec",
@@ -55,15 +60,15 @@ function download_verify(
     # verify if file exists
     if isfile(dest)
         file_existed = true
-        if hash !== nothing && verify(dest, hash)
+        if hash === nothing
+            return true
+        end
+        if verify(dest, hash)
             # hash verified
             return true
-        else
-            # either hash is nothing or couldn't pass the SHA test
-            @error(
-                "Failed to verify file: $dest with hash: $hash. Re-downloading file..."
-            )
         end
+        # hash couldn't be verified
+        @error("Failed to verify file: $dest with hash: $hash. Re-downloading file...")
     end
     # if the file exists but some problem exists, we delete it to start from scratch
     file_existed && Base.rm(dest; force = true)
