@@ -9,6 +9,9 @@ function f!(F,x,Δxm,Δz2,Δz3,Ma,Δy)
         F[2] = x[2] - (Δxm - Δx21)/sqrt((Δxm-Δx21)^2+Δy^2)
         return nothing
     else
+        # Keep residuals finite so solvers don't see NaNs from uninitialized F.
+        F[1] = 1e3 + abs(x[1])
+        F[2] = 1e3 + abs(x[2])
         return nothing
     end
 end
@@ -25,6 +28,7 @@ function refraction_correction(Δx,Δy,Δz,Ma,h1,h2)
     r0 = sqrt(Δx^2+Δy^2+Δz^2)
     a0 = sqrt(Δx^2+Δy^2)/r0
     b0 = Δx/sqrt(Δx^2+Δy^2)
+    a0 = clamp(a0, -0.8, 0.8)
     Δz2,Δz3 = h1,h2
     
     res = nlsolve((F,x)->f!(F,x,Δx,Δz2,Δz3,Ma,Δy),[a0,b0],autoscale=false)
