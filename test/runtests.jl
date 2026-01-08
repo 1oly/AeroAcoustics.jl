@@ -8,9 +8,22 @@ const testdatadir = @__DIR__
 REPO_URL = "https://gitlab.windenergy.dtu.dk/ollyl/aeroacousticsdata/raw/master/"
 
 remotefiles = [
-    ("data/test1_csm.h5", "8f2ba2948f852cf7e406d4c8ad1988beecc5e437f38c1d9369d502891e8e947a"),
-    #("data/test1_timeseries.h5", "1f897db4039138f0c31f9cb340cce3304b85949f9f745200cc161f47426e45ec")
-    ]
+    (
+        "data/test1_csm.h5",
+        "8f2ba2948f852cf7e406d4c8ad1988beecc5e437f38c1d9369d502891e8e947a",
+        REPO_URL * "data/test1_csm.h5?inline=false",
+    ),
+    (
+        "data/task6_DTU_AeroAcousticsjl_CBF_srcint.csv",
+        "c75ab472c9767435e801523e157526b936f31d53858119c58833c2a410699ab5",
+        "https://raw.githubusercontent.com/MicrophoneArrayBenchmarking/airfoil-in-kevlar-walled-windtunnel/main/data/task6_DTU_AeroAcousticsjl_CBF_srcint.csv",
+    ),
+    #(
+    #    "data/test1_timeseries.h5",
+    #    "1f897db4039138f0c31f9cb340cce3304b85949f9f745200cc161f47426e45ec",
+    #    REPO_URL * "data/test1_timeseries.h5?inline=false",
+    #)
+]
 
 # Fix instead of using BinaryProvider 
 # https://github.com/yeesian/ArchGDAL.jl/blob/master/test/remotefiles.jl
@@ -74,13 +87,12 @@ function download_verify(
     return !file_existed
 end
 
-for (f, sha) in remotefiles
+for (f, sha, url) in remotefiles
     # create the directories if they don't exist
     currdir = dirname(f)
     isdir(currdir) || mkpath(currdir)
     # download the file if it is not there or if it has a different checksum
     currfile = normpath(joinpath(testdatadir, f))
-    url = REPO_URL * f * "?inline=false"
     download_verify(url, sha, currfile)
 end
 
@@ -89,5 +101,6 @@ end
         include("utility_tests.jl")
         include("csm_test.jl")
         include("monopole_noflow.jl")
+        include("benchmark_airfoil.jl")
     end
 end

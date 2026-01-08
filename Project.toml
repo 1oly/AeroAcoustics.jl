@@ -3,7 +3,7 @@ uuid = "03ede2b8-90d7-56cb-9af1-359a44c6802d"
 keywords = ["AeroAcoustics"]
 license = "MIT"
 desc = "A package for post-processing of microphone array measurements"
-version = "0.2.6"
+version = "0.2.7"
 authors = ["Oliver Lylloff <ollyl@dtu.dk>"]
 
 [deps]
@@ -18,11 +18,11 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 ThreadsX = "ac1d9e8a-700a-412c-b207-f0111f4b6c0d"
 
 [compat]
-DSP = "0.6.7, 0.7"
+DSP = "0.6.7,0.7,0.8"
 Distances = "0.10"
 FFTW = "1.1"
-NLsolve = "4"
 NLSolversBase = "<7.9"
+NLsolve = "4"
 Parameters = "0.12.3"
 Statistics = "1"
 ThreadsX = "0.1.10"
@@ -30,6 +30,7 @@ julia = "1.6"
 
 [extras]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -37,4 +38,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [targets]
-test = ["Test", "Dates", "SHA", "Downloads", "HDF5"]
+test = ["Test", "Dates", "DelimitedFiles", "SHA", "Downloads", "HDF5"]
